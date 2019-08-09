@@ -1,0 +1,13 @@
+include("cmake/gremlin/gremlin.cmake")
+
+GN_option(GN_bDebug off)
+GN_option(GN_bTests on)
+GN_option(GN_vcpkg_vcpkgRoot "")
+GN_Init()
+
+project("Engine")
+
+GN_Subprojects(
+    algos    # indepened alogithms
+    projects # applications use system api
+)
