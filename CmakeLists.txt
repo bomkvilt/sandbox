@@ -1,13 +1,22 @@
+cmake_minimum_required(VERSION 3.15)
 include("cmake/gremlin/gremlin.cmake")
 
-GN_option(GN_bDebug off)
-GN_option(GN_bTests on)
-GN_option(GN_vcpkg_vcpkgRoot "")
+# setup enviroment
+GN_option(GN_bDebug off)            # diable unit's entry prints
+GN_option(GN_bTests on)             # enable tests
+GN_option(GN_vcpkg_vcpkgRoot "")    # use a gloab vcpkg instance
+
+# tune directory names
+GN_option(GN_dir_private "private")
+GN_option(GN_dir_public "public")
+GN_option(GN_dir_tests "tests")
+
 GN_Init()
 
-project("Engine")
+project("Algos")
 
 GN_Subprojects(
     algos    # indepened alogithms
     projects # applications use system api
+    codeforce
 )
