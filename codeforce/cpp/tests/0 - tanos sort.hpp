@@ -50,6 +50,5 @@ int main()
 
 	std::cout << TanosSort::GetMaxLen(vv) << "\n";
 }
-#endif //!CODEFORCE_CPP_0_YELOWCARDS_HPP
-
+#endif //!CODEFORCE_CPP_0_TANOSSORT_HPP
 #endif //!CODEFORCE_CPP_0_TANOSSORT_HPP
