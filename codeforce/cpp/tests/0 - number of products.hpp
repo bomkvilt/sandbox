@@ -11,10 +11,10 @@ class NumOfProds
 public:
 	static std::tuple<int, int> GetCounts(const std::vector<int>& vv)
 	{
-		int n = 0;
-		int p = 0;
-		int nlen = 0;
-		int plen = 0;
+		int64_t n = 0;
+		int64_t p = 0;
+		int64_t nlen = 0;
+		int64_t plen = 0;
 
 		for (auto r = 0; r < vv.size(); ++r)
 		{
@@ -33,7 +33,7 @@ public:
 };
 
 
-#if 0
+#if 1
 #include <iostream>
 int main()
 {

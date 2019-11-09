@@ -1,0 +1,5 @@
+GN_Subprojects(
+    boost
+    reflect
+    math
+)
