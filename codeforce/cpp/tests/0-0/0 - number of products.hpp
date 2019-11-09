@@ -9,7 +9,7 @@
 class NumOfProds
 {
 public:
-	static std::tuple<int, int> GetCounts(const std::vector<int>& vv)
+	static std::tuple<int64_t, int64_t> GetCounts(const std::vector<int>& vv)
 	{
 		int64_t n = 0;
 		int64_t p = 0;
@@ -33,7 +33,7 @@ public:
 };
 
 
-#if 1
+#if 0
 #include <iostream>
 int main()
 {

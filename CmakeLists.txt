@@ -16,8 +16,7 @@ GN_Init()
 project("Algos")
 
 GN_Subprojects(
-    libs
-    # algos    # indepened alogithms
-    projects # applications use system api
-    # codeforce
+    # libs
+    # projects
+    codeforce
 )
