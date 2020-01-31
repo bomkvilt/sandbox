@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_0_TANOSSORT_HPP
-#define CODEFORCE_CPP_0_TANOSSORT_HPP
+#ifndef CODEFORCE_CPP__0_TANOSSORT_HPP
+#define CODEFORCE_CPP__0_TANOSSORT_HPP
 
 #include <vector>
 #include <algorithm>
@@ -51,4 +51,4 @@ int main()
 	std::cout << TanosSort::GetMaxLen(vv) << "\n";
 }
 #endif //!CODEFORCE_CPP_0_TANOSSORT_HPP
-#endif //!CODEFORCE_CPP_0_TANOSSORT_HPP
+#endif //!CODEFORCE_CPP__0_TANOSSORT_HPP

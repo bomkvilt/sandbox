@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_600_HALK_HPP
-#define CODEFORCE_CPP_600_HALK_HPP
+#ifndef CODEFORCE_CPP__600_HALK_HPP
+#define CODEFORCE_CPP__600_HALK_HPP
 
 #include <string>
 
@@ -40,4 +40,4 @@ int main()
 	std::cout << Halk::GetFillings(n) << std::endl;
 }
 #endif //!CODEFORCE_CPP_600_HALK_HPP
-#endif //!CODEFORCE_CPP_600_HALK_HPP
+#endif //!CODEFORCE_CPP__600_HALK_HPP

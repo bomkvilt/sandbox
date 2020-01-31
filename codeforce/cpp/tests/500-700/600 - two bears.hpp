@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_600_TWOBEARS_HPP
-#define CODEFORCE_CPP_600_TWOBEARS_HPP
+#ifndef CODEFORCE_CPP__600_TWOBEARS_HPP
+#define CODEFORCE_CPP__600_TWOBEARS_HPP
 
 #include <cmath>
 
@@ -31,4 +31,4 @@ int main()
 	std::cout << TwoBears::GetTime(a, b) << std::endl;
 }
 #endif //!CODEFORCE_CPP_600_TWOBEARS_HPP
-#endif //!CODEFORCE_CPP_600_TWOBEARS_HPP
+#endif //!CODEFORCE_CPP__600_TWOBEARS_HPP

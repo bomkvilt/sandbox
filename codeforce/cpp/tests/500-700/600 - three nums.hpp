@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_600_THREENUMS_HPP
-#define CODEFORCE_CPP_600_THREENUMS_HPP
+#ifndef CODEFORCE_CPP__600_THREENUMS_HPP
+#define CODEFORCE_CPP__600_THREENUMS_HPP
 
 
 #include <tuple>
@@ -33,4 +33,4 @@ int main()
 	std::cout << a << " " << b << " " << c << std::endl;
 }
 #endif //!CODEFORCE_CPP_600_THREENUMS_HPP
-#endif //!CODEFORCE_CPP_600_THREENUMS_HPP
+#endif //!CODEFORCE_CPP__600_THREENUMS_HPP

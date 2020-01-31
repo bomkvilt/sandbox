@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_0_YELOWCARDS_HPP
-#define CODEFORCE_CPP_0_YELOWCARDS_HPP
+#ifndef CODEFORCE_CPP__0_YELOWCARDS_HPP
+#define CODEFORCE_CPP__0_YELOWCARDS_HPP
 
 #include <tuple>
 
@@ -68,4 +68,4 @@ int main()
 	std::cout << min << " " << max << "\n";
 }
 #endif //!CODEFORCE_CPP_0_YELOWCARDS_HPP
-#endif //!CODEFORCE_CPP_0_YELOWCARDS_HPP
+#endif //!CODEFORCE_CPP__0_YELOWCARDS_HPP

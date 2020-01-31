@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_600_CARTGAME_HPP
-#define CODEFORCE_CPP_600_CARTGAME_HPP
+#ifndef CODEFORCE_CPP__600_CARTGAME_HPP
+#define CODEFORCE_CPP__600_CARTGAME_HPP
 
 #include <array>
 
@@ -25,4 +25,4 @@ int main()
 	std::cout << "NO" << std::endl;
 }
 #endif //!CODEFORCE_CPP_600_CARTGAME_HPP
-#endif //!CODEFORCE_CPP_600_CARTGAME_HPP
+#endif //!CODEFORCE_CPP__600_CARTGAME_HPP

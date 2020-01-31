@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP_600_FAFA_HPP
-#define CODEFORCE_CPP_600_FAFA_HPP
+#ifndef CODEFORCE_CPP__600_FAFA_HPP
+#define CODEFORCE_CPP__600_FAFA_HPP
 
 
 #if 0
@@ -22,4 +22,4 @@ int main()
 	std::cout << count << std::endl;
 }
 #endif //!CODEFORCE_CPP_600_FAFA_HPP
-#endif //!CODEFORCE_CPP_600_FAFA_HPP
+#endif //!CODEFORCE_CPP__600_FAFA_HPP
