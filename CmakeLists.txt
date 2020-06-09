@@ -10,6 +10,9 @@ GN_option(GN_dir_private "private")
 GN_option(GN_dir_public "public")
 GN_option(GN_dir_tests "tests")
 
+GN_option(GN_staticRuntime off)
+GN_option(GN_staticLinkage on)
+
 # ---------------------------|
 
 GN_init()

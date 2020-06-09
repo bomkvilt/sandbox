@@ -4,5 +4,5 @@ set dir=./build/windows
 if not exist "%dir%" mkdir "%dir%"
 
 pushd "%dir%"
-cmake -j8 ../..
+cmake -DVCPKG_TARGET_TRIPLET=x64-windows -j8 ../..
 popd
