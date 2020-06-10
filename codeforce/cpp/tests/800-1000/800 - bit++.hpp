@@ -1,5 +1,5 @@
-#ifndef CODEFORCE_CPP__800_BIT++_HPP
-#define CODEFORCE_CPP__800_BIT++_HPP
+#ifndef CODEFORCE_CPP__800_BIT___HPP
+#define CODEFORCE_CPP__800_BIT___HPP
 #define TESTNAME __
 
 #ifndef TMAIN
@@ -35,4 +35,4 @@ TMAIN()
 	return 0;
 }
 
-#endif //!CODEFORCE_CPP__800_BIT++_HPP
+#endif //!CODEFORCE_CPP__800_BIT___HPP
