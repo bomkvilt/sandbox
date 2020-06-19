@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_TWINS_HPP
 #define CODEFORCE_CPP__900_TWINS_HPP
-#define TESTNAME __
+#define TESTNAME TWINS
 
 #ifndef TMAIN
 #define TMAIN int main

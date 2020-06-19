@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_FOOTBALL_HPP
 #define CODEFORCE_CPP__900_FOOTBALL_HPP
-#define TESTNAME __
+#define TESTNAME FOOTBALL
 
 #ifndef TMAIN
 #define TMAIN int main

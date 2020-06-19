@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_HQ9__HPP
 #define CODEFORCE_CPP__900_HQ9__HPP
-#define TESTNAME __
+#define TESTNAME HQ9P
 
 #ifndef TMAIN
 #define TMAIN int main

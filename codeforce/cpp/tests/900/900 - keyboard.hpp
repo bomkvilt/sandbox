@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_KEYBOARD_HPP
 #define CODEFORCE_CPP__900_KEYBOARD_HPP
-#define TESTNAME __
+#define TESTNAME KEYBOARD
 
 #ifndef TMAIN
 #define TMAIN int main

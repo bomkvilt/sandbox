@@ -4,8 +4,6 @@
 
 #ifndef TMAIN
 #define TMAIN int main
-#else
-#define TMAINN TMAINJ(TESTNAME)
 #endif
 
 #include <iostream>

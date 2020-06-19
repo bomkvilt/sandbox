@@ -1,12 +1,9 @@
 #ifndef CODEFORCE_CPP__800_TOOLONGWORD_HPP
 #define CODEFORCE_CPP__800_TOOLONGWORD_HPP
-
-#define TESTNAME TooLongWord
+#define TESTNAME TOOLONGWORD
 
 #ifndef TMAIN
 #define TMAIN int main
-#else
-#define TMAINN TMAINJ(TESTNAME)
 #endif
 
 #include <iostream>

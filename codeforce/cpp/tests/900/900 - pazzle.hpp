@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_PAZZLE_HPP
 #define CODEFORCE_CPP__900_PAZZLE_HPP
-#define TESTNAME __
+#define TESTNAME PAZZLE
 
 #ifndef TMAIN
 #define TMAIN int main

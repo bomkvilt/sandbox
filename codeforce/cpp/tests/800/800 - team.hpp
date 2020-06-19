@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__800_TEAM_HPP
 #define CODEFORCE_CPP__800_TEAM_HPP
-#define TESTNAME __
+#define TESTNAME TEAM
 
 #ifndef TMAIN
 #define TMAIN int main

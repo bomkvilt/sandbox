@@ -4,9 +4,7 @@
 #include <gtest/gtest.h>
 
 
-#define TMAIN int TMAINN
-#define TMAINJ(name) name##Main
-
+#define TMAIN int TESTNAME
 
 
 #endif //!CODEFORCE_CPP__CF_TEST_HPP

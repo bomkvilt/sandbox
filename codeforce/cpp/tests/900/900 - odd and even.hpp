@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_ODDANDEVEN_HPP
 #define CODEFORCE_CPP__900_ODDANDEVEN_HPP
-#define TESTNAME __
+#define TESTNAME ODDANDEVEN
 
 #ifndef TMAIN
 #define TMAIN int main

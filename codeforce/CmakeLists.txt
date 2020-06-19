@@ -1,3 +1,5 @@
 GN_subprojects(
     cpp
+    cpp-debug
+    cpp-utiles
 )

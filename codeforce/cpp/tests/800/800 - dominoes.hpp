@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__800_DOMINOES_HPP
 #define CODEFORCE_CPP__800_DOMINOES_HPP
-#define TESTNAME __
+#define TESTNAME DOMINOES
 
 #ifndef TMAIN
 #define TMAIN int main

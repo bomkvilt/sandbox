@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_BONBONS_HPP
 #define CODEFORCE_CPP__900_BONBONS_HPP
-#define TESTNAME __
+#define TESTNAME BONBONS
 
 #ifndef TMAIN
 #define TMAIN int main

@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__800_NEXTRAUND_HPP
 #define CODEFORCE_CPP__800_NEXTRAUND_HPP
-#define TESTNAME __
+#define TESTNAME NEXTRAUND
 
 #ifndef TMAIN
 #define TMAIN int main

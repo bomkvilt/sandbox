@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__900_DUBSTEP_HPP
 #define CODEFORCE_CPP__900_DUBSTEP_HPP
-#define TESTNAME __
+#define TESTNAME DUBSTEP
 
 #ifndef TMAIN
 #define TMAIN int main

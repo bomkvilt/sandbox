@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__800_BIT___HPP
 #define CODEFORCE_CPP__800_BIT___HPP
-#define TESTNAME __
+#define TESTNAME BITPP
 
 #ifndef TMAIN
 #define TMAIN int main
