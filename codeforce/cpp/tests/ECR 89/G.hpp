@@ -1,6 +1,6 @@
 #ifndef CODEFORCE_CPP__G_HPP
 #define CODEFORCE_CPP__G_HPP
-#define TESTNAME __
+#define TESTNAME ECR89_G
 
 #ifndef TMAIN
 #define TMAIN int main
