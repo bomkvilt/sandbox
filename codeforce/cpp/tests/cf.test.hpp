@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 
-#define TMAIN int TESTNAME
+#define TMAIN int PROBLEM_NAME
 
 
 #endif //!CODEFORCE_CPP__CF_TEST_HPP
