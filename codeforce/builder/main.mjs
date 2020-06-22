@@ -9,11 +9,11 @@ yargs.command({
     builder:    (yargs) => yargs
         .positional('complexity', {
             desc: 'codeforces` test complexity',
-            type: 'number'
+            type: 'string'
         })
         .positional('testID', {
             desc: 'codeforces` test id',
-            type: 'number'
+            type: 'string'
         })
         .positional('testName', {
             desc: 'human-readable test name',
@@ -36,7 +36,7 @@ yargs.command({
     builder:    (yargs) => yargs
         .positional('testID', {
             desc: 'selected problem codeforces` ID',
-            type: 'number'
+            type: 'string'
         }).option('root', {
             alias: 'r',
             type: 'string',

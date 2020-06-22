@@ -9,7 +9,7 @@ REM -------------------------------------------------------
     set "complexity=%2"
     set "testID=%3"
     set "testName=%4"
-    call :call_any "node" "./builder/main.mjs" "add" %complexity% %testID% %testName% -r %root%
+    call :call_any "node" "./builder/main.mjs" "add" %complexity% %testID% %testName% -r %root% %5 %6
     exit /B 0
 :cmd_test
     set "testID=%2"
