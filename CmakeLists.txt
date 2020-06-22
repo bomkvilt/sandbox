@@ -22,5 +22,5 @@ project("Algos")
 GN_subprojects(
     # libs
     # projects
-    codeforce
+    codeforces
     )

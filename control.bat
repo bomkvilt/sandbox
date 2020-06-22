@@ -8,7 +8,7 @@ REM -------------------------------------------------------
 :cmd_vs
     call :call_script "run_project"
 :cmd_cf
-    pushd "./codeforce"
+    pushd "./codeforces"
     call "./control.bat" %2 %3 %4 %5 %6 %7 %8 %9
     popd
     call :cmd_gen
