@@ -1,1 +1,3 @@
-GN_unit(codeforce-cpp)
+GN_unit(codeforce-cpp
+    mode "eTests"
+)

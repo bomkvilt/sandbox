@@ -2,6 +2,8 @@
 #define CODEFORCE_CPP__CF_TEST_HPP
 
 #include <gtest/gtest.h>
+#include <unordered_map>
+#include <array>
 
 
 // it's hackyway to use a macro defintion's value as a function name
