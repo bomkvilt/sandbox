@@ -1,4 +1,0 @@
-GN_Unit(cros_basis_cmd
-    Units cross_basis_internal
-    Mode app
-)

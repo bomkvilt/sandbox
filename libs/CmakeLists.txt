@@ -1,5 +1,0 @@
-GN_subprojects(
-    boost
-    reflect
-    math
-)

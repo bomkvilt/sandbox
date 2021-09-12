@@ -1,3 +1,0 @@
-GN_subprojects(
-    cross_basis
-)
