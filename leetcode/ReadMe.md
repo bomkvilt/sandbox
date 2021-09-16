@@ -6,7 +6,10 @@
         - [Last Stone Weight II](<2 medium/1049. Last Stone Weight II.cpp>)
 - Graphs
     - [Tarjan's strongly connected components](<../algoritms/graphs/misc/Tarjan's connections.md>)
-        - [Critical Connections in a Network](<3 hard/1192. Critical Connections in a Network.cpp>)
+        - [Critical Connections in a Network](<solutions/graphs - connections/1192. Critical Connections in a Network.cpp>)
+- Trees
+    - Traverses: BFS
+        - [BFS with level control](<solutions/graphs - trees - BFS & DFS/662. Maximum Width of Binary Tree.cpp>)
 
 
 ## Tricks:
