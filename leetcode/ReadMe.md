@@ -10,6 +10,7 @@
 - Trees
     - Traverses: BFS
         - [BFS with level control](<solutions/graphs - trees - BFS & DFS/662. Maximum Width of Binary Tree.cpp>)
+        - [BFS with time priority](<solutions/graphs - trees - BFS & DFS/743. Network Delay Time.cpp>)
 
 
 ## Tricks:
