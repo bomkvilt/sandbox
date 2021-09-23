@@ -12,6 +12,11 @@
         - [BFS with level control](<solutions/graphs - trees - BFS & DFS/662. Maximum Width of Binary Tree.cpp>)
         - [BFS with time priority](<solutions/graphs - trees - BFS & DFS/743. Network Delay Time.cpp>)
         - [Delete if not betwean ](<solutions/graphs - trees - BFS & DFS/669. Trim a Binary Search Tree.cpp>)
+    - Segment Tree
+        - [Mutable sum of index range](<solutions/graphs - trees - Index trees/307. Range Sum Query - Mutable.cpp>)
+- Enumerations
+    - Ways to get permulations:
+        - [v1](<solutions/math - enumerations/949. Largest Time for Given Digits.cpp>)
 
 
 ## Tricks:
