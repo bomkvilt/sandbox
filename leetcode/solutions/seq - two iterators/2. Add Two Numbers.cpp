@@ -3,56 +3,54 @@
  * struct ListNode {
  *     int val;
  *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
  */
-
-class Solution 
-{
+class Solution {
 public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* head  = nullptr;
+        ListNode* front = nullptr;
+        int rest = 0;
 
-    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
-    {
-        if(!l1) return l2;
-        if(!l2) return l1;
+        for (; l1 && l2; l1 = l1->next, l2 = l2->next) {
+            const auto summ = l1->val + l2->val + rest;
+            const auto val = summ % 10;
+            rest = summ / 10;
+
+            auto node = new ListNode(val);
+            if (front) {
+                front->next = node;
+            }
+            else {
+                head = node;
+            }
+            front = node;
+        }
         
-        ListNode  head(-1);
-        ListNode* tail = &head;
-        const auto addNode = [&tail](int val)
-        {
-            auto newNode = new ListNode(val);
-            tail->next = newNode;
-            tail = newNode;
-        };
-        
-        auto itr1 = l1;
-        auto itr2 = l2;
-        auto shift = 0;
-        while (itr1 && itr2)
-        {
-            const auto sum = itr1->val + itr2->val + shift;
-            const auto val = sum % 10;
-            shift = sum / 10;
-            addNode(val);
+        const auto* lr = l1 ? l1 : l2;
+        for (; lr; lr = lr->next) {
+            const auto summ = lr->val + rest;
+            const auto val = summ % 10;
+            rest = summ / 10;
             
-            itr1 = itr1->next;
-            itr2 = itr2->next;
+            auto node = new ListNode(val);
+            if (front) {
+                front->next = node;
+            }
+            else {
+                head = node;
+            }
+            front = node;
         }
         
-        auto itr = itr1 ? itr1 : itr2;
-        for (; itr; itr = itr->next)
-        {
-            const auto sum = itr->val + shift;
-            const auto val = sum % 10;
-            shift = sum / 10;
-            addNode(val);
+        if (rest) {
+            auto node = new ListNode(rest);
+            front->next = node;
+            front = node;
         }
-        
-        if (shift)
-        {
-            addNode(shift);
-        }
-        
-        return head.next;
+        return head;
     }
 };
