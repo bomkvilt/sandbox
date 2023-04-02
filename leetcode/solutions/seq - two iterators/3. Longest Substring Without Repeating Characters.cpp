@@ -1,33 +1,30 @@
-#include <unordered_map>
+// https://leetcode.com/problems/longest-substring-without-repeating-characters/description/
+
+#include <unordered_set>
 
 
-
-class Solution 
-{
+class Solution {
 public:
-
-    int lengthOfLongestSubstring(string s) 
-    {
-        auto lastCharMap = std::unordered_map<char, int>();
-        
-        int curLen = 0;
-        int maxLen = 0;
-        for (int i = 0; i < s.length(); ++i)
-        {
-            const auto c = s[i];
-            
-            auto itr = lastCharMap.find(c);
-            if (itr != lastCharMap.end())
-            {
-                maxLen = std::max(maxLen, curLen);
-                curLen = std::min(curLen + 1, i - itr->second);
-            }
-            else
-            {
-                ++curLen;
-            }
-            lastCharMap[c] = i;
+    int lengthOfLongestSubstring(std::string s) {
+        if (s.empty()) {
+            return 0;
         }
-        return std::max(curLen, maxLen);
+
+        std::unordered_set<char> chars;
+        
+        size_t maxWidth = 0;
+
+        auto l = s.begin();
+        auto r = s.begin();
+        for (; r != s.end(); ++r) {
+            const auto ci = *r;
+            while (chars.find(ci) != chars.end()) {
+                chars.erase(*(l++));
+            }
+            chars.insert(ci);
+            maxWidth = std::max(maxWidth, chars.size());
+        }
+        
+        return maxWidth;
     }
 };
