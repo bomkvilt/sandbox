@@ -1,26 +1,36 @@
 cmake_minimum_required(VERSION 3.15)
-include("cmake/gremlin/gremlin.cmake")
+# include("cmake/gremlin/gremlin.cmake")
 
 # ---------------------------| enviroment
 # use a gloab vcpkg instance
-GN_option(GN_vcpkg_vcpkgRoot "")
+# GN_option(GN_vcpkg_vcpkgRoot "")
 
 # tune directory names
-GN_option(GN_dir_private "private")
-GN_option(GN_dir_public "public")
-GN_option(GN_dir_tests "tests")
+# GN_option(GN_dir_private "private")
+# GN_option(GN_dir_public "public")
+# GN_option(GN_dir_tests "tests")
 
-GN_option(GN_staticRuntime off)
-GN_option(GN_staticLinkage on)
+# GN_option(GN_staticRuntime off)
+# GN_option(GN_staticLinkage on)
 
 # ---------------------------|
 
-GN_init()
+# GN_init()
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 23)
+
+# Export compile commands for use with clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 project("Algos")
 
-GN_subprojects(
-    # libs
-    # projects
-    codeforces
-    )
+add_subdirectory(projects/async_cpp)
+
+# GN_subprojects(
+#     # libs
+#     # projects
+#     # codeforces
+# )
