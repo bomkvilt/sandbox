@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // https://github.com/SpaceIm/vscode-cpp-cmake-conan-template/blob/conan-v2-ninja-no-presets/.vscode/tasks.json
+            "label": "conan-01: install",
+            "type": "shell",
+            "command": "conan",
+            "args": [
+                "install", "\"${workspaceFolder}\"",
+                "-b", "missing",
+                "-of", "\"${command:cmake.buildDirectory}/.conan\"",
+                // build context
+                "-pr:b", "\"${command:cmake.buildKit}\"",
+                "-s:b", "build_type=Release",
+                "-o:b", "\"*:shared=False\"",
+                "-c:b", "tools.cmake.cmaketoolchain:generator=Ninja",
+                // Host context
+                "-pr:h", "\"${command:cmake.buildKit}\"",
+                "-s:h", "\"build_type=${command:cmake.buildType}\"",
+                "-c:h", "tools.cmake.cmaketoolchain:generator=Ninja",
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}

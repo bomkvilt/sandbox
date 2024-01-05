@@ -6,3 +6,6 @@
 
 # built targets linked to source make files
 *.built.link
+
+# conan
+/CMakeUserPresets.json
