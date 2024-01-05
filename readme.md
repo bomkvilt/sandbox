@@ -5,7 +5,10 @@
 
 The project uses Conan package manager. Main tasks and settings are listed in a `./.vscode` derectory.
 
-
+* clone all required submodules
+  ```sh
+  git submodule update
+  ```
 
 * Create all requred profile files for all required cmake kits (if the profiles are missing):
   * profiles are located in `~/.conan2/profiles/<profile name>` files

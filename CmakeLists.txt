@@ -1,21 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
-# include("cmake/gremlin/gremlin.cmake")
+include("cmake/gremlin/gremlin_v3.cmake")
 
-# ---------------------------| enviroment
-# use a gloab vcpkg instance
-# GN_option(GN_vcpkg_vcpkgRoot "")
-
-# tune directory names
-# GN_option(GN_dir_private "private")
-# GN_option(GN_dir_public "public")
-# GN_option(GN_dir_tests "tests")
-
-# GN_option(GN_staticRuntime off)
-# GN_option(GN_staticLinkage on)
-
-# ---------------------------|
-
-# GN_init()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -26,19 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 project(algos)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-enable_testing()
-find_package(GTest REQUIRED)
-
-include(CTest)
-include(GoogleTest)  # gtest_discover_tests
+gn3_option(gn3_target_add_folders_enabled true)
+gn3_init()
 
 add_subdirectory(projects/async_cpp)
-
-# GN_subprojects(
-#     # libs
-#     # projects
-#     # codeforces
-# )
