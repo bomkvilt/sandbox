@@ -1,10 +1,11 @@
-import parac_compiler;
+// import a_study;
 
-#include <iostream>
+// #include <iostream>
 
 
 int main() {
-    std::cout << "hellow" << std::endl;
-    std::cout << TA{}.Name() << std::endl;
-    return 0;
+//     std::cout << "hellow" << std::endl;
+//     std::cout << NA::TA{}.Name() << std::endl;
+//     std::cout << NA::TA{}.A() << std::endl;
+//     return 0;
 }

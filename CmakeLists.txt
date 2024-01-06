@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.28)
 include("cmake/gremlin/gremlin_v3.cmake")
 
 
@@ -12,12 +12,12 @@ gn3_init()
 # ---------------------------
 
 # enforce c++23
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
+set(CXX_SCAN_FOR_MODULES true)
 set(CMAKE_CXX_STANDARD 23)
 
 # Export compile commands for use with clangd
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 # use latest c++ libraries
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -33,4 +33,5 @@ endif()
 # ---------------------------
 
 add_subdirectory(projects/async_cpp)
+add_subdirectory(projects/c++20.modules)
 add_subdirectory(projects/c++23.views)
