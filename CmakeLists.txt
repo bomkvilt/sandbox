@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.15)
 include("cmake/gremlin/gremlin_v3.cmake")
 
 
+project(algos)
+gn3_option(gn3_target_add_folders_enabled true)
+gn3_init()
+
+
+# ---------------------------
+# global setup
+# ---------------------------
+
+# enforce c++23
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 23)
@@ -9,9 +19,18 @@ set(CMAKE_CXX_STANDARD 23)
 # Export compile commands for use with clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# use latest c++ libraries
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # use libc++ to use latest c++ library
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+else()
+    message(FATAL_ERROR "not supported compiler '${CMAKE_CXX_COMPILER_ID}'")
+endif()
 
-project(algos)
-gn3_option(gn3_target_add_folders_enabled true)
-gn3_init()
+
+# ---------------------------
+# main
+# ---------------------------
 
 add_subdirectory(projects/async_cpp)
+add_subdirectory(projects/c++23.views)
