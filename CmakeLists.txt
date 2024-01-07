@@ -32,6 +32,6 @@ endif()
 # main
 # ---------------------------
 
-add_subdirectory(projects/async_cpp)
 add_subdirectory(projects/c++20.modules)
+add_subdirectory(projects/c++23.coroutines)
 add_subdirectory(projects/c++23.views)

@@ -1,8 +1,10 @@
 #include <coroutine>
+#include <exception>
 
 #include "gtest/gtest.h"
 
 
+// https://github.com/tilir/cpp-masters/blob/master/coroutines/natseq.cc
 namespace {
     template <typename T>
     struct generator {
@@ -39,6 +41,7 @@ namespace {
 
         using coro_handle = std::coroutine_handle<promise_type>;
 
+    public:
         bool move_next() {
             return handle_ ? (handle_.resume(), !handle_.done()) : false;
         }
@@ -75,7 +78,7 @@ namespace {
 namespace {
     generator<int> natural_nums() {
         int num = 0;
-        for (;;) {
+        while (true) {
             co_yield num;
             num += 1;
         }
@@ -83,7 +86,7 @@ namespace {
 }
 
 
-TEST(coroutines, natseq) {
+TEST(cpp23_coro_generators_simple, simple_test) {
     int n = 0;
     auto nums = natural_nums();
 
