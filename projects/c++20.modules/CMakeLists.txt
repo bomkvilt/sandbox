@@ -1,4 +1,5 @@
 add_subdirectory(ut)
+add_subdirectory(consumer)
 
 add_library(c++20.modules)
 
@@ -10,7 +11,7 @@ target_sources(
     module.cppm
     submodule/a.cppm
   PRIVATE
-    # NOTE: implementation units and ordinary .cpp files
+    # NOTE: implementation units are ordinary .cpp files
     module.cpp
     submodule/a.cpp
 )

@@ -4,7 +4,11 @@ target_sources(
   c++20.modules.ut
   PRIVATE
     FILE_SET modules TYPE CXX_MODULES FILES
-      tests.cpp
+    # NOTE: the .cpp file defines a <>.ut module
+    public_tests.cpp
+  PRIVATE
+    # NOTE: the .cpp file uses being tested module's name
+    private_tests.cpp
 )
 
 gn3_target_link_binary_to_src(c++20.modules.ut)
