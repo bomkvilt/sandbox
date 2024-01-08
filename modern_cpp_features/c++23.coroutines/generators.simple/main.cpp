@@ -5,8 +5,8 @@
 #include "gtest/gtest.h"
 
 /**
- * https://github.com/tilir/cpp-masters/blob/master/coroutines/natseq.cc
- *  Case study: simple c++ generator that
+ * SA: https://github.com/tilir/cpp-masters/blob/master/coroutines/natseq.cc
+ * Case study: simple c++ generator that
  *  - has a lazy initialization (initial_suspend() == std::suspend_always{})
  *  - caches a yielded value and allows to access the one multiple times
  */
@@ -63,6 +63,8 @@ namespace {
             rhs.Handle_ = nullptr;
         }
 
+        // TODO: rule of 5
+
         ~TGenerator() {
             if (Handle_) {
                 Handle_.destroy();
@@ -71,7 +73,7 @@ namespace {
 
         bool Next() {
             // NOTE: if the function is called when an underlined coro has already been finished
-            // `Handle_.resume()` will try to acces already released memory, hence the `&& !Handle_.done()`
+            // Handle_.resume() will try to acces already released memory, hence the `&& !Handle_.done()`
             return Handle_ && !Handle_.done() ? (Handle_.resume(), !Handle_.done()) : false;
         }
 
@@ -94,7 +96,7 @@ namespace {
 }
 
 
-TEST(cpp23_coro_generators_simple, simple_test) {
+GTEST_TEST(cpp23_coro_generators_simple, simple_test) {
     static constexpr size_t NUMS_COUNT = 10;
 
     auto nums = ::NaturalNums(NUMS_COUNT);
@@ -104,11 +106,12 @@ TEST(cpp23_coro_generators_simple, simple_test) {
         GTEST_ASSERT_TRUE(nums.Next());
 
         // check the cached result
-        const auto y = nums.CurrentValue();
-        GTEST_ASSERT_EQ(y, n);
+        GTEST_ASSERT_EQ(nums.CurrentValue(), n);
     }
 
-    // inner cucle must be exited
+    // inner cucle must be completed
     GTEST_ASSERT_FALSE(nums.Next());
-    GTEST_ASSERT_FALSE(nums.Next());
+
+    // NOTE: yield NUMS_COUNT - 1; ++num >= NUMS_COUNT; coroutine is finished
+    GTEST_ASSERT_EQ(nums.CurrentValue(), NUMS_COUNT - 1);
 }
