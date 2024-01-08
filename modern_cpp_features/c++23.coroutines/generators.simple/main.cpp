@@ -1,28 +1,37 @@
 #include <coroutine>
+#include <cstddef>
 #include <exception>
 
 #include "gtest/gtest.h"
 
-
-// https://github.com/tilir/cpp-masters/blob/master/coroutines/natseq.cc
+/**
+ * https://github.com/tilir/cpp-masters/blob/master/coroutines/natseq.cc
+ *  Case study: simple c++ generator that
+ *  - has a lazy initialization (initial_suspend() == std::suspend_always{})
+ *  - caches a yielded value and allows to access the one multiple times
+ */
 namespace {
     template <typename T>
-    struct generator {
-        struct promise_type {
+    class TGenerator final {
+    public:
+        struct promise_type final {
+        public:
             using coro_handle = std::coroutine_handle<promise_type>;
 
+        public:
             T current_value;
 
+        public:
             auto get_return_object() {
                 return coro_handle::from_promise(*this);
             }
 
             auto initial_suspend() {
-                return std::suspend_always();
+                return std::suspend_always{};
             }
 
             auto final_suspend() noexcept {
-                return std::suspend_always();
+                return std::suspend_always{};
             }
 
             void return_void() {
@@ -34,7 +43,7 @@ namespace {
             }
 
             auto yield_value(T value) {
-                current_value = value;
+                current_value = std::move(value);
                 return std::suspend_always{};
             }
         };
@@ -42,58 +51,64 @@ namespace {
         using coro_handle = std::coroutine_handle<promise_type>;
 
     public:
-        bool move_next() {
-            return handle_ ? (handle_.resume(), !handle_.done()) : false;
-        }
+        TGenerator(coro_handle h)
+            : Handle_(h)
+        {}
 
-        T current_value() const {
-            return handle_.promise().current_value;
-        }
+        TGenerator(TGenerator const &) = delete;
 
-        generator(coro_handle h)
-            : handle_(h)
+        TGenerator(TGenerator &&rhs)
+            : Handle_(rhs.Handle_)
         {
+            rhs.Handle_ = nullptr;
         }
 
-        generator(generator const &) = delete;
-
-        generator(generator &&rhs)
-            : handle_(rhs.handle_)
-        {
-            rhs.handle_ = nullptr;
-        }
-
-        ~generator() {
-            if (handle_) {
-                handle_.destroy();
+        ~TGenerator() {
+            if (Handle_) {
+                Handle_.destroy();
             }
         }
 
+        bool Next() {
+            // NOTE: if the function is called when an underlined coro has already been finished
+            // `Handle_.resume()` will try to acces already released memory, hence the `&& !Handle_.done()`
+            return Handle_ && !Handle_.done() ? (Handle_.resume(), !Handle_.done()) : false;
+        }
+
+        T CurrentValue() const {
+            return Handle_.promise().current_value;
+        }
+
     private:
-        coro_handle handle_;
+        coro_handle Handle_;
     };
 }
 
 
 namespace {
-    generator<int> natural_nums() {
-        int num = 0;
-        while (true) {
+    TGenerator<int> NaturalNums(size_t end) {
+        for (int num = 0; num < end; num += 1) {
             co_yield num;
-            num += 1;
         }
     }
 }
 
 
 TEST(cpp23_coro_generators_simple, simple_test) {
-    int n = 0;
-    auto nums = natural_nums();
+    static constexpr size_t NUMS_COUNT = 10;
 
-    for (int i = 0; i < 10; ++i) {
-        nums.move_next();
-        auto y = nums.current_value();
-        EXPECT_EQ(y, n);
-        n = n + 1;
+    auto nums = ::NaturalNums(NUMS_COUNT);
+
+    for (int i = 0, n = 0; i < NUMS_COUNT; ++i, ++n) {
+        // generate and cache a next value
+        GTEST_ASSERT_TRUE(nums.Next());
+
+        // check the cached result
+        const auto y = nums.CurrentValue();
+        GTEST_ASSERT_EQ(y, n);
     }
+
+    // inner cucle must be exited
+    GTEST_ASSERT_FALSE(nums.Next());
+    GTEST_ASSERT_FALSE(nums.Next());
 }

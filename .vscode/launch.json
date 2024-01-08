@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    // TODO: teach gn3 generate the configurations
+    "configurations": [
+        {
+            "name": "modern_cpp_features/c++23.coroutines/generators.simple/c++23.coro.generators.simple.built.link",
+            "request": "launch",
+            "type": "cppdbg",
+
+            "program": "${workspaceFolder}/modern_cpp_features/c++23.coroutines/generators.simple/c++23.coro.generators.simple.built.link",
+            "environment": [],
+            "args": [],
+            "cwd": "${workspaceFolder}/modern_cpp_features/c++23.coroutines/generators.simple",
+
+            "MIMode": "",
+
+
+            "presentation": {
+                "group": "Run", 
+                "order": 1
+            },
+
+            // TODO: teach gn3 build specific targets only
+            // "preLaunchTask": "build"
+        }
+    ]
+}
