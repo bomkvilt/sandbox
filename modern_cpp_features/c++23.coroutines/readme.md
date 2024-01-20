@@ -4,6 +4,9 @@ Good lectures:
 - https://www.youtube.com/watch?v=mDajl0pIUjQ
 - https://www.youtube.com/watch?v=WZhxMwKaXmw
 
+Articles:
+- how to build an effitient generator: https://habr.com/ru/articles/754314/
+
 -----
 
 Function public inteface decomposition:

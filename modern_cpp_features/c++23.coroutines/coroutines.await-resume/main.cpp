@@ -41,8 +41,7 @@ namespace {
              *  ```
              *  co_yield <value> ≅ co_await coroutine_promise.yield_value(<value>)
              *  ```
-             *
-             *  NOTE: attemts to yeild something will rise the compiler error
+             *  NOTE: any attemt to yeild something will rise the compiler error
              *  ```
              *  No member named 'yield_value' in '(anonymous namespace)::TResumable::promise_type'clang(no_member)
              *  ```
