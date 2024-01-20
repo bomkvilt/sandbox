@@ -22,6 +22,9 @@ namespace {
             using coro_handle = std::coroutine_handle<promise_type>;
 
         public:
+            // NOTE: the pointer is valid since it's a pointer to a coroutnie's local variable
+            // ```co_yeld /*promice*/.yield_value(current_value);```
+            // And it must be valid until the control flow returned to the coro (Handle_.resume();)
             const T* current_value;
 
         public:
