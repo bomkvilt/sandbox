@@ -21,7 +21,7 @@
 
 ## Tricks:
 Way to optimize code with use of a compiler
-```
+```cpp
 #pragma GCC optimize("O3")
 
 static auto _f = [](){

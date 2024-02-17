@@ -1,14 +1,17 @@
 // https://leetcode.com/problems/4sum/description/
 
+#include <algorithm>
+#include <vector>
+
 
 class Solution {
 public:
-    vector<vector<int>> fourSum(vector<int>& nums, int target) {
+    std::vector<std::vector<int>> fourSum(std::vector<int>& nums, int target) {
         if (nums.size() < 4) {
             return {};
         }
 
-        std::sort(nums.begin(), nums.end());
+        std::ranges::sort(nums);
 
         auto result = std::vector<std::vector<int>>();
 
@@ -44,6 +47,6 @@ public:
                 }
             }
         }
-        return std::move(result);
+        return result;
     }
 };
