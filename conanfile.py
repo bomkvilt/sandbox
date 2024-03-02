@@ -7,7 +7,9 @@ import conan.tools.cmake
 class HelloConan(conan.ConanFile):
     settings: Final = ("os", "compiler", "build_type", "arch")
 
+    # NOTE: run "conan-01: install" vscode task
     requires: Final = (
+        "benchmark/1.8.3",
         "gtest/1.14.0",
     )
 

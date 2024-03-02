@@ -22,7 +22,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 # use latest c++ libraries
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # use libc++ to use latest c++ library
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -march=native")
 else()
     message(FATAL_ERROR "not supported compiler '${CMAKE_CXX_COMPILER_ID}'")
 endif()

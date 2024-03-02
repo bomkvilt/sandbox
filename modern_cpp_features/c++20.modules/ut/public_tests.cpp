@@ -3,10 +3,11 @@ module;
 #include "gtest/gtest.h"
 
 // NOTE: the unit must be a module to avoid clangd errors like
-// ```
-// In included file: 'std::fpos' has different definitions in different modules; first difference is defined here found constructor with body
-// ```
+// ```In included file: 'std::fpos' has different definitions in different modules; first difference is defined here found constructor with body```
+
 // NOTE: The error affects clangd only; code is compilable
+// SA: https://github.com/clangd/clangd/issues/1293
+// SA: https://github.com/clangd/clangd/issues/1892
 export module test_module.ut;
 
 import test_module;
