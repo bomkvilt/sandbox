@@ -40,8 +40,8 @@ private:
         }
 
         template <typename TI, typename TS>
-        bool operator()(std::ranges::subrange<TI, TS> s, const int x, const int y) {
-            if (x < 0 || x >= X || y < 0 || y >= Y) {
+        bool operator()(std::ranges::subrange<TI, TS> s, size_t x, size_t y) {
+            if (x >= X || y >= Y) {
                 return false;
             }
 
