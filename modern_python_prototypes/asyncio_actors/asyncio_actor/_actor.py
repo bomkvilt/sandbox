@@ -74,7 +74,7 @@ class Actor(ScopedObject, metaclass=ActorMetaClass):
     """
 
 
-def asyncio_actor_method():
+def actor_method():
     def decorator[S: Actor, **P, R](action: Callable[Concatenate[S, P], Coroutine[Any, Any, R]], /):
         method = ActorMethod(action)
         return method
@@ -82,7 +82,7 @@ def asyncio_actor_method():
 
 
 @final
-class AsyncioActorRef[A: Actor](ScopedObject):
+class ActorRef[A: Actor](ScopedObject):
     def __init__(self, backend: ActorBackend[A]) -> None:
         super().__init__()
         self.__backend = backend
