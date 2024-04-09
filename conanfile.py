@@ -1,7 +1,10 @@
+import sys
 from typing import Final
 
 import conan
 import conan.tools.cmake
+
+print(f"using typthon version: {sys.version}")
 
 
 class HelloConan(conan.ConanFile):

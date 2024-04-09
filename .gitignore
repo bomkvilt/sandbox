@@ -9,3 +9,7 @@
 
 # conan
 /CMakeUserPresets.json
+
+# python
+/.venv/*
+__pycache__

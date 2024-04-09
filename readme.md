@@ -40,3 +40,34 @@ The project uses Conan package manager. Main tasks and settings are listed in a 
 ## useful links
 - clang++ standard versions support statuses
   https://libcxx.llvm.org/#c-dialect-support
+
+
+## other notes
+
+- how to install a newmost python
+  ```sh
+  # add repo and install required packages
+  sudo apt update
+  sudo apt install software-properties-common -y
+  sudo add-apt-repository ppa:deadsnakes/ppa -y
+  sudo apt install python3.12
+
+  # check that python was installed
+  python3.12 --version
+
+  # install libs
+  sudo apt install python3.12-dev
+  sudo apt install python3.12-venv
+  sudo apt install python3.12-distutils
+
+  # update links
+  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 12
+  ```
+
+- how to install a newmost clang++
+  ```sh
+  # https://ubuntuhandbook.org/index.php/2023/09/how-to-install-clang-17-or-16-in-ubuntu-22-04-20-04/
+  wget https://apt.llvm.org/llvm.sh
+  chmod u+x llvm.sh
+  sudo ./llvm.sh 17 all
+  ```
