@@ -19,7 +19,6 @@ namespace {
     using TInt = int;
 
     void clangd_clutch(...) {
-        // NOTE: clangd issues with unused ```#include <coroutine>```
         auto _ = std::suspend_never{};
     }
 

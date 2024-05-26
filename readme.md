@@ -1,5 +1,9 @@
 ## How to build
 
+> NOTE: the project uses CMake since bazzel does not support c++20 models from the box
+> https://github.com/bazelbuild/bazel/issues/4005
+
+
 The project uses Conan package manager. Main tasks and settings are listed in a `./.vscode` derectory.
 
 * load all the required submodules
@@ -15,7 +19,7 @@ The project uses Conan package manager. Main tasks and settings are listed in a 
     conan profile detect --force
     ```
 
-  * real profile example (`~/.conan2/profiles/Clang 17.0.6 x86_64-pc-linux-gnu`):
+  * profile example (`~/.conan2/profiles/Clang 17.0.6 x86_64-pc-linux-gnu`):
     ```ini
     [settings]
     arch=x86_64
