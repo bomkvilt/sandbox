@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import contextlib
 import typing
 from collections.abc import Callable
 from typing import Any, Concatenate, Coroutine, Final, Protocol, Self, final, runtime_checkable
@@ -19,15 +18,15 @@ class ActorMetaClass(abc.ABCMeta):
 
 
 @runtime_checkable
-class ActorBackend[A: 'Actor'](contextlib.AbstractAsyncContextManager, Protocol):
-    async def send[**P, R](self, method: ActorMethod[A, P, R], *args: P.args, **kwargs: P.kwargs) -> R:
-        ...
+class ActorBackendProtocol[A: 'Actor'](Protocol):
+    async def __aenter__(self: Self) -> Self: ...
+    async def __aexit__(self, et, ev, tb, /) -> Any:  ...
+    async def send[**P, R](self, method: ActorMethod[A, P, R], *args: P.args, **kwargs: P.kwargs) -> R: ...
 
 
 @runtime_checkable
 class ActorBackendFactory[A: 'Actor', **AP](Protocol):
-    def __call__(self, actor_factory: Callable[AP, A], *args: AP.args, **kwargs: AP.kwargs) -> ActorBackend[A]:
-        ...
+    def __call__(self, actor_factory: Callable[AP, A], *args: AP.args, **kwargs: AP.kwargs) -> ActorBackendProtocol[A]: ...
 
 
 _ATTRS_TO_COPY: Final = ("__module__", "__name__", "__qualname__", )
@@ -70,7 +69,18 @@ class ActorMethod[S: 'Actor', **P, R]:
 
 
 class Actor(ScopedObject, metaclass=ActorMetaClass):
-    """ Asymmetric actor class.
+    """
+    Asymmetric actor class.
+
+    Actors can:
+    - create child actors
+    - send messages to the actors and receive the responses.
+
+    Actors MUST be used as async context managers.
+    Otherwise the actor's distructor will call os.abort().
+
+    Actors can only be used in the context they were created at.
+    The limitation is caused by the fact that actors can be launched in subprocesses.
     """
 
 
@@ -83,7 +93,7 @@ def actor_method():
 
 @final
 class ActorRef[A: Actor](ScopedObject):
-    def __init__(self, backend: ActorBackend[A]) -> None:
+    def __init__(self, backend: ActorBackendProtocol[A]) -> None:
         super().__init__()
         self.__backend = backend
 

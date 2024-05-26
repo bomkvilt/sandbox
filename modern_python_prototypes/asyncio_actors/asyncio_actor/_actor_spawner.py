@@ -2,19 +2,19 @@ import copy
 from collections.abc import Callable
 from typing import Final, Self, final
 
-from ._actor import Actor, ActorBackend, ActorBackendFactory, ActorRef
-from .backends import DummyBackend
+from . import backends
+from ._actor import Actor, ActorBackendFactory, ActorBackendProtocol, ActorRef
 
 
 @final
 class ActorSpawner[**P, A: Actor]:
     def __init__(self, actor_factory: Callable[P, A]) -> None:
         self.__actor_factory: Final = actor_factory
-        self.__backend_actory: ActorBackendFactory[A, P] = DummyBackend[A, P]
+        self.__backend_actory: ActorBackendFactory[A, P] = backends.DummyBackend[A, P]
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> ActorRef[A]:
         backend: Final = self.__backend_actory(self.__actor_factory, *args, **kwargs)
-        assert isinstance(backend, ActorBackend)
+        assert isinstance(backend, ActorBackendProtocol)
         return ActorRef[A](backend)
 
     def using_backend(self: Self, factory: ActorBackendFactory[A, P]) -> Self:

@@ -1,117 +1,129 @@
 import asyncio
 import concurrent.futures
-import dataclasses
 import multiprocessing
-import multiprocessing.connection
-import queue
-from collections.abc import Callable
-from types import TracebackType
-from typing import Any, Awaitable, Final, Self, final
+import multiprocessing.managers
+import threading
+from collections.abc import Callable, Coroutine
+from typing import Any, Final, Self, Unpack, final, override
 
-from asyncio_actor._actor import Actor, ActorBackend, ActorMethod
-from asyncio_actor._scoped_object import ScopedObject
+from .._actor import Actor, ActorBackendProtocol, ActorMethod
+from .._scoped_object import ExcTuple, ScopedObject
 
 
 @final
 class _DeviceMessage[A: Actor, **P, R]:
+    """ The class a method binding that would be called by an `remote` actor.
+    """
+    __slots__: Final = ("__method", "__kwargs", "__args", )
+
     def __init__(self, method: ActorMethod[A, P, R], *args: P.args, **kwargs: P.kwargs) -> None:
-        self.method = method
-        self.kwargs = kwargs
-        self.args = args
+        self.__method: Final = method
+        self.__kwargs: Final = kwargs
+        self.__args: Final = args
+
+    def __call__(self, actor: A) -> Coroutine[Any, Any, R]:
+        return self.__method.__func__(actor, *self.__args, **self.__kwargs)
 
 
 @final
-@dataclasses.dataclass(kw_only=True, slots=True)
-class _HostMessage[A: Actor, **P, R]:
-    future: concurrent.futures.Future[R]
-    payload: _DeviceMessage[A, P, R]
+class _SubprocessActorFactory[A: Actor, **AP]:
+    """ The class is a factory that binds typing info and allows to create a new actor instance.
+    """
+    __slots__: Final = ("__actor_factory", "__actor_kwargs", "__actor_args", )
 
-
-@final
-@dataclasses.dataclass(kw_only=True, slots=True)
-class _DeviceResponse:
-    result: Any | None = None
-    exception: Exception | None = None
-
-    def fill(self, future: concurrent.futures.Future[Any]) -> None:
-        if self.exception is not None:
-            future.set_exception(self.exception)
-        else:
-            future.set_result(self.result)
-
-
-def _run_new_loop[**P, R](action: Callable[P, Awaitable[R]]) -> Callable[P, R]:
-    def wraper(*args: P.args, **kwargs: P.kwargs) -> R:
-        loop: Final = asyncio.new_event_loop()
-        try:
-            asyncio.set_event_loop(loop)
-            return loop.run_until_complete(action(*args, **kwargs))
-        finally:
-            loop.close()
-    return wraper
-
-
-@final
-class SubprocessBackend[A: Actor, **AP](ScopedObject, ActorBackend):
     def __init__(self, actor_factory: Callable[AP, A], *args: AP.args, **kwargs: AP.kwargs) -> None:
-        super().__init__()
         self.__actor_factory: Final = actor_factory
         self.__actor_kwargs: Final = kwargs
         self.__actor_args: Final = args
-        self.__queue: Final = queue.Queue[_HostMessage[Any, Any, Any] | None]()
-        self.__done: Final = asyncio.Event()
 
+    def __call__(self) -> A:
+        return self.__actor_factory(*self.__actor_args, **self.__actor_kwargs)
+
+
+@final
+class _SubprocessActorWrapper[A: Actor, **AP]:
+    """ A singlethon class that represents a subprocess actor class.
+        NOTE: the actor must be terminated by a `.terminate()` method
+    """
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, "__instance__"):
+            cls.__instance__ = super().__new__(cls)
+        return cls.__instance__
+
+    def __init__(self, factory: _SubprocessActorFactory[A, AP] | None = None) -> None:
+        if factory is not None:
+            self.__actor: Final = factory()
+            self.__loop: Final = asyncio.new_event_loop()
+            self.__loop.run_until_complete(self.__actor.__aenter__())
+
+    @classmethod
+    def terminate(cls) -> None:
+        assert hasattr(cls, "__instance__"), "The actor process is already terminated."
+        wrapper: Final = _SubprocessActorWrapper()
+        wrapper.__loop.run_until_complete(wrapper.__actor.__aexit__(None, None, None))
+        delattr(cls, "__instance__")
+
+    @classmethod
+    def handle[**P, R](cls, msg: _DeviceMessage[A, P, R], canceled: threading.Event, /) -> R:
+        async def cancel(task: asyncio.Task[Any]) -> None:
+            # NOTE: we need to propagate cancelattion tokens betwean two async loops
+            await asyncio.to_thread(canceled.wait)
+            task.cancel()
+
+        async def inner() -> R:
+            coro: Final = msg(wrapper.__actor)  # NOTE: see below the method
+            task: Final = wrapper.__loop.create_task(coro)
+            cancel_task: Final = wrapper.__loop.create_task(cancel(task))
+            try:
+                return await task
+            finally:
+                cancel_task.cancel()
+
+        wrapper: Final = _SubprocessActorWrapper()
+        return wrapper.__loop.run_until_complete(inner())
+
+
+@final
+class SubprocessBackend[A: Actor, **AP](ScopedObject, ActorBackendProtocol):
+    def __init__(self, actor_factory: Callable[AP, A], *args: AP.args, **kwargs: AP.kwargs) -> None:
+        super().__init__()
+        self.__process_pool: Final = concurrent.futures.ProcessPoolExecutor(
+            # NOTE: I don't know what context should be used here
+            # - fork contexts allow to use the code within Jupter Notebooks (and works faster)
+            # - spawn contexts should create new environments
+            mp_context=multiprocessing.get_context("fork"),
+
+            # NOTE: we create an actor singletone in the new subprocess === process pool
+            initializer=_SubprocessActorWrapper,
+            initargs=(_SubprocessActorFactory(actor_factory, *args, **kwargs), ),
+            max_workers=1,  # pool == actor
+        )
+        """ The process pool allows to use high level asyncio primitives.
+        """
+
+        self.__manager: Final = multiprocessing.Manager()
+        """ The manager allows to share syncronisation (cancelation) primitives betwean processes.
+        """
+
+    @override
     async def __aenter__(self: Self) -> Self:
         await super().__aenter__()
-        self._create_subtask(asyncio.to_thread(self._run_collector))
+        await self._enter_sync(self.__process_pool)
+        await self._enter_sync(self.__manager)
         return self
 
-    async def __aexit__(self, et: type[BaseException] | None, ev: BaseException | None, tb: TracebackType | None) -> None:
-        await self.stop()
-        await super().__aexit__(et, ev, tb)
-
-    async def stop(self) -> None:
-        self.__queue.put(None)
+    @override
+    async def __aexit__(self, *exc: Unpack[ExcTuple]) -> None | bool:
+        loop: Final = asyncio.get_event_loop()
+        await loop.run_in_executor(self.__process_pool, _SubprocessActorWrapper.terminate)
+        await super().__aexit__(*exc)
 
     async def send[**P, R](self, method: ActorMethod[A, P, R], *args: P.args, **kwargs: P.kwargs) -> R:
-        task: Final = _HostMessage(
-            future=concurrent.futures.Future(),
-            payload=_DeviceMessage(method, *args, **kwargs),
-        )
-        self.__queue.put(task)
-        return await asyncio.wrap_future(task.future)
-
-    @_run_new_loop
-    async def _run_subprocess(self, pipe: multiprocessing.connection.Connection) -> None:
-        async with self.__actor_factory(*self.__actor_args, **self.__actor_kwargs) as actor:
-            while (request := pipe.recv()) is not None:
-                try:
-                    assert isinstance(request, _DeviceMessage)
-                    result = await request.method.__func__(actor, *request.args, **request.kwargs)
-                    pipe.send(_DeviceResponse(result=result))
-                except Exception as e:
-                    pipe.send(_DeviceResponse(exception=e))
-            pipe.send(None)
-
-    def _run_collector(self) -> None:
-        hst_pipe, dev_pipe = multiprocessing.Pipe()
-        process: Final = multiprocessing.Process(target=self._run_subprocess, args=(dev_pipe, ))
+        canceled: Final = self.__manager.Event()
         try:
-            process.start()
-
-            while (task := self.__queue.get()) is not None:
-                hst_pipe.send(task.payload)
-                response: Final = hst_pipe.recv()
-                assert isinstance(response, _DeviceResponse)
-                response.fill(task.future)
-
-            hst_pipe.send(None)
-            process.join()
-
+            loop: Final = asyncio.get_event_loop()
+            msg: Final = _DeviceMessage(method, *args, **kwargs)
+            return await loop.run_in_executor(self.__process_pool, _SubprocessActorWrapper.handle, msg, canceled)
         except BaseException:
-            process.terminate()
-            process.join()
+            canceled.set()
             raise
-
-        finally:
-            self.__done.set()

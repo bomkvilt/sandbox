@@ -2,12 +2,12 @@ import asyncio
 from collections.abc import Callable
 from typing import Final, Self, final
 
-from asyncio_actor._actor import Actor, ActorBackend, ActorMethod
-from asyncio_actor._scoped_object import ScopedObject
+from .._actor import Actor, ActorBackendProtocol, ActorMethod
+from .._scoped_object import ScopedObject
 
 
 @final
-class DummyBackend[A: Actor, **AP](ScopedObject, ActorBackend):
+class DummyBackend[A: Actor, **AP](ScopedObject, ActorBackendProtocol):
     def __init__(self, actor_factory: Callable[AP, A], *args: AP.args, **kwargs: AP.kwargs) -> None:
         super().__init__()
         self.__actor_factory: Final = lambda: actor_factory(*args, **kwargs)
