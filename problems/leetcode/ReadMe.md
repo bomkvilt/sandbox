@@ -1,5 +1,9 @@
 # LeetCode problem's solutions
 
+TODO:
+- https://leetcode.com/problems/longest-substring-with-at-most-two-distinct-characters/description/
+- https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/description/
+
 ## Problem classes
 - Knapsack problem
     - 0-1 problem
