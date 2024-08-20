@@ -2,29 +2,30 @@ import sys
 from typing import Final
 
 import conan
-import conan.tools.cmake
+import conan.tools.google
 
 print(f"using typthon version: {sys.version}")
 
 
-class HelloConan(conan.ConanFile):
+class Conan(conan.ConanFile):
     settings: Final = ("os", "compiler", "build_type", "arch")
 
-    # NOTE: run "conan-01: install" vscode task
-    requires: Final = (
-        "benchmark/1.8.3",
-        "gtest/1.14.0",
-    )
+    def requirements(self) -> None:
+        assert self.requires is not None
+        self.requires("asio/1.30.2")
+        self.requires("benchmark/1.8.3")
+        self.requires("gtest/1.14.0")
 
-    generators: Final = (
-        "CMakeToolchain",
-        "CMakeDeps",
-    )
+    def build_requirements(self) -> None:
+        pass
 
-    def cmake_layout(self) -> None:
-        conan.tools.cmake.cmake_layout(self)
+    def configure(self) -> None:
+        pass
 
-    def build(self) -> None:
-        cmake: Final = conan.tools.cmake.CMake(self)
-        cmake.configure()
-        cmake.build()
+    def layout(self) -> None:
+        self.folders.generators = "build/conan"
+        conan.tools.google.bazel_layout(self)
+
+    def generate(self):
+        bazel_deps: Final = conan.tools.google.BazelDeps(self)
+        bazel_deps.generate()

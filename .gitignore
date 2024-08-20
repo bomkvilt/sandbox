@@ -1,8 +1,10 @@
 # clangd
 /.cache/*
 
-# cmake build
-/build/*
+# bazel build
+/bazel-*
+/build/conan
+/build/conan-profiles
 
 # built targets linked to source make files
 *.built.link

@@ -1,3 +1,0 @@
-[submodule "cmake/gremlin"]
-	path = cmake/gremlin
-	url = https://github.com/bomkvilt/gremlin.git

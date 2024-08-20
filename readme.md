@@ -6,9 +6,18 @@
 
 The project uses Conan package manager. Main tasks and settings are listed in a `./.vscode` derectory.
 
-* load all the required submodules
+* Create a new python virtual environment and install all required packages
   ```sh
-  git submodule update
+  pip install -r requirements.txt
+  ```
+
+* Setup a build system and create
+  ```sh
+  # "activate" a hermetic llvm toolchain
+  bazelisk build build/setup
+
+  # compile dependencies
+  python ./tools/setup/setup.py
   ```
 
 * Create all requred profile files for all required cmake kits (if the profiles are missing):
@@ -41,6 +50,15 @@ The project uses Conan package manager. Main tasks and settings are listed in a 
   * run `build`
 
 
+### Basel build system
+
+Basic tutorial: https://bazel.build/start/cpp
+
+- install basel using Bazelisk https://github.com/bazelbuild/bazelisk/blob/master/README.md
+- 
+
+
+
 ## useful links
 - clang++ standard versions support statuses
   https://libcxx.llvm.org/#c-dialect-support
@@ -48,7 +66,9 @@ The project uses Conan package manager. Main tasks and settings are listed in a 
 
 ## other notes
 
-- how to install a newmost python
+- how to install a newmost python: <p>
+  NOTE: Just a usefull information. <p>
+  NOTE: The Python interpreter will be used in a local venv.
   ```sh
   # add repo and install required packages
   sudo apt update
@@ -68,7 +88,18 @@ The project uses Conan package manager. Main tasks and settings are listed in a 
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 12
   ```
 
-- how to install a newmost clang++
+- how to update pip package versions:
+  ```sh
+  # update the packages themselves
+  pip list --outdated --format=json | jq '.[].name' | xargs -n1 pip install --upgrade
+
+  # update requirements.txt
+  pip freeze > requirements.txt
+  ```
+
+- how to install a newmost clang++: <p>
+  NOTE: Just a usefull information. <p>
+  NOTE: Currently, the project uses Bazel build system with hermetic toolchains.
   ```sh
   # https://ubuntuhandbook.org/index.php/2023/09/how-to-install-clang-17-or-16-in-ubuntu-22-04-20-04/
   wget https://apt.llvm.org/llvm.sh
