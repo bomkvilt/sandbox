@@ -6,28 +6,12 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
     },
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}"
+    ],
     "editor.defaultFormatter": "ms-python.black-formatter",
     "notebook.defaultFormatter": "ms-python.black-formatter",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.defaultInterpreterPath": "./.venv/bin/python3.12",
 }
-
-// group: cmake + clangd
-// https://github.com/SpaceIm/vscode-cpp-cmake-conan-template/blob/conan-v2-ninja-no-presets/.vscode/settings.json
-// > clangd:
-// "clangd.arguments": [
-//     "--compile-commands-dir=${workspaceFolder}/build/.clangd"
-// ],
-// "cmake.copyCompileCommands": "${workspaceFolder}/build/.clangd/compile_commands.json",
-// "cmake.exportCompileCommandsFile": true,
-// // > cmake
-// "cmake.buildDirectory": "${workspaceFolder}/build/${buildKit}/${buildType}",
-// "cmake.configureArgs": [
-//     "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/build/${buildKit}/${buildType}/.conan/conan_toolchain.cmake"
-// ],
-// "cmake.preferredGenerators": [
-//     "Ninja"
-// ],
-// "cmake.useCMakePresets": "never"
-// group: end

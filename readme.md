@@ -1,70 +1,30 @@
 ## How to build
 
-> NOTE: the project uses CMake since bazzel does not support c++20 models from the box
-> https://github.com/bazelbuild/bazel/issues/4005
+The project uses a buzzle build system and conan package manager.
+To configure them all:
 
-
-The project uses Conan package manager. Main tasks and settings are listed in a `./.vscode` derectory.
-
-* Create a new python virtual environment and install all required packages
+* Create a new python (3.12+) virtual environment and install all required packages:
   ```sh
   pip install -r requirements.txt
   ```
 
-* Setup a build system and create
-  ```sh
-  # "activate" a hermetic llvm toolchain
-  bazelisk build build/setup
+* Install bazelisk:
+  (a) https://bazel.build/start/cpp
+  (b) https://github.com/bazelbuild/bazelisk/blob/master/README.md
 
-  # compile dependencies
+* Setup a build environment:
+  ```sh
   python ./tools/setup/setup.py
   ```
 
-* Create all requred profile files for all required cmake kits (if the profiles are missing):
-  * profiles are located in `~/.conan2/profiles/<profile name>` files
-
-  * `default` profile can be created with the command
-    ```sh
-    conan profile detect --force
-    ```
-
-  * profile example (`~/.conan2/profiles/Clang 17.0.6 x86_64-pc-linux-gnu`):
-    ```ini
-    [settings]
-    arch=x86_64
-    compiler=clang          # change to see possible variants; {gcc; clang; ...}
-    compiler.version=17     # clang++17
-    compiler.libcxx=libc++  # use clang's c++ std library (support of c++{20, 23} features)
-    build_type=Release
-    os=Linux
-
-    [conf]
-    # by default conan uses c++ compiler regardless on the `compiler=clang` line above
-    # NOTE: single line expression
-    tools.build:compiler_executables={'c': '/usr/bin/clang-17', 'cpp': '/usr/bin/clang++-17'}
-    ```
-
-* Install a task runner extension (e.g. (Task Runner)[<https://marketplace.visualstudio.com/items?itemName=forbeslindesay.forbeslindesay-taskrunner>]).
-  * run `conan-01: install` (The step will build specfied conan packages)
-  * run `configure` (The step will initialize all the cmake stuff and configure the project)
-  * run `build`
-
-
-### Basel build system
-
-Basic tutorial: https://bazel.build/start/cpp
-
-- install basel using Bazelisk https://github.com/bazelbuild/bazelisk/blob/master/README.md
-- 
-
-
 
 ## useful links
+
 - clang++ standard versions support statuses
   https://libcxx.llvm.org/#c-dialect-support
 
 
-## other notes
+## notes
 
 - how to install a newmost python: <p>
   NOTE: Just a usefull information. <p>
@@ -106,3 +66,9 @@ Basic tutorial: https://bazel.build/start/cpp
   chmod u+x llvm.sh
   sudo ./llvm.sh 17 all
   ```
+
+- how to integrate CMake with clangd:
+  https://github.com/SpaceIm/vscode-cpp-cmake-conan-template/blob/conan-v2-ninja-no-presets/.vscode/settings.json
+
+- how to integrate bazel with clangd:
+  https://github.com/hedronvision/bazel-compile-commands-extractor
