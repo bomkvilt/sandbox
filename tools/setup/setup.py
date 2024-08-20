@@ -2,7 +2,6 @@ import logging
 import os
 import pathlib
 import subprocess
-from multiprocessing import process
 from typing import Final, final
 
 import _internal
@@ -67,7 +66,7 @@ class _Setup:
 
     def setup_bazel(self) -> None:
         subprocess.run(
-            ["bazelisk", "build", "tools/setup"],
+            ["bazelisk", "build", "tools/setup/_dummy"],
             capture_output=False,
             check=True,
         )

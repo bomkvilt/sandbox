@@ -1,4 +1,2 @@
 
-The target is a simpke most C++ application that's required to configure a hermetic llvm infrastructure.
-
-The target was envented to build conan packages using configured the llvm toolchain.
+This tool allows to glue a hermetic toolchain, configured by the buzzle build system, and conan package manager.
