@@ -3,6 +3,5 @@ exports_files(
     [
         "rustfmt.toml",
         "clippy.toml",
-        "Cargo.toml",
     ]
 )

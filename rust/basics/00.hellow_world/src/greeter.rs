@@ -14,11 +14,11 @@ impl Greeter {
         }
     }
 
-    pub fn from_txt_file() -> runfiles::Result<Greeter> {
-        let r = runfiles::Runfiles::create()?;
+    pub fn from_resource_file() -> runfiles::Result<Greeter> {
+        let resource = runfiles::Runfiles::create()?;
         Ok(Greeter {
             greeting: std::fs::read_to_string(
-                runfiles::rlocation!(r, "sandbox/rust/basics/00.hellow_world/data/greeting.txt").unwrap(),
+                runfiles::rlocation!(resource, "sandbox/rust/basics/00.hellow_world/data/greeting.txt").unwrap(),
             )
             .map_err(runfiles::RunfilesError::RunfileIoError)?,
         })
@@ -46,7 +46,7 @@ mod test {
 
     #[test]
     fn test_greeting_from_txt_file() {
-        let welcome = Greeter::from_txt_file().unwrap();
+        let welcome = Greeter::from_resource_file().unwrap();
         assert_eq!("Welcome Rust", welcome.greeting("Rust"));
     }
 }
