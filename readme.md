@@ -17,6 +17,22 @@ To configure them all:
   python ./tools/setup/setup.py
   ```
 
+* Refresh `compile_commands.json`
+  ```sh
+  bazelisk build @hedron_compile_commands//:refresh_all
+  ```
+
+* Refresh `rust-project.json`
+  ```sh
+  bazelisk run @rules_rust//tools/rust_analyzer:gen_rust_project
+  ```
+
+* Apply auto formatters
+  ```sh
+  # rust
+  bazelisk run @rules_rust//:rustfmt
+  ```
+
 
 ## useful links
 
@@ -65,6 +81,14 @@ To configure them all:
   wget https://apt.llvm.org/llvm.sh
   chmod u+x llvm.sh
   sudo ./llvm.sh 17 all
+  ```
+
+- how to install rust: <p>
+  NOTE: Even if Bazel loads the sealed toolchain, it doesn't expose rustfmt to the sysroot.
+    Therefore, it's necessary to add an external formatter binary to enable formatting in the IDE.
+  ```sh
+  # https://doc.rust-lang.org/book/ch01-01-installation.html
+  curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
   ```
 
 - how to integrate CMake with clangd:

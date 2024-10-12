@@ -1,0 +1,7 @@
+[package]
+name = "basics-00_hellow_world"
+edition = "2021"
+version = "0.0.0"
+
+[dependencies]
+rand = "0.8.5"

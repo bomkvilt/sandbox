@@ -6,9 +6,10 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
     },
-    "clangd.arguments": [
-        "--compile-commands-dir=${workspaceFolder}"
-    ],
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        "editor.formatOnSave": true,
+    },
     "editor.defaultFormatter": "ms-python.black-formatter",
     "notebook.defaultFormatter": "ms-python.black-formatter",
     "python.analysis.autoImportCompletions": true,

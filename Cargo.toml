@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "rust/basics/00.hellow_world",
+]
+
+[profile.release]
+lto = true

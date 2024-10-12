@@ -33,7 +33,7 @@ class _Setup:
         _check_directory(self.__proj_root)
 
         self.__llvm_root: Final = _deduce_buld_root() / _LLVM_RELATIVE_ROOT
-        _check_directory(self.__llvm_root)
+        _check_directory(self.__llvm_root, missing=True)
 
         self.__profile_root: Final = self.__proj_root / _CONAN_PROFILES_ROOT
         _check_directory(self.__profile_root, missing=True)
