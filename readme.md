@@ -104,7 +104,7 @@ Additional usefull information:
   ```
 
 * how to install rust:
-  NOTE: Even if Bazel loads the sealed toolchain, it doesn't expose rustfmt to the sysroot.
+  NOTE: Even if Bazel loads the hermetic toolchain, it doesn't expose rustfmt to the sysroot.
     Therefore, it's necessary to add an external formatter binary to enable formatting in the IDE.
 
   ```sh

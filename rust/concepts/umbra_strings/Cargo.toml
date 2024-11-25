@@ -1,0 +1,7 @@
+[package]
+name = "concepts_umbra_strings"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+paste = "1.0.15"
