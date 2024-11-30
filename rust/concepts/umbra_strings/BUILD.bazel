@@ -12,7 +12,7 @@ rust_library(
 )
 
 rust_test(
-    name = "concepts_umbra_strings_test",
+    name = "test",
     srcs = [
         "test/lib.rs",
     ],

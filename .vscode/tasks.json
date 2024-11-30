@@ -2,13 +2,13 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "rust/concepts/umbra_strings:concepts_umbra_strings_test",
+            "label": "rust/concepts/umbra_strings:test",
             "type": "shell",
 
             "command": "python",
             "args": [
                 "${workspaceFolder}/build/scripts/link_test.py",
-                "rust/concepts/umbra_strings:concepts_umbra_strings_test",
+                "rust/concepts/umbra_strings:test",
                 "${workspaceFolder}/build/links/current_test.lnk",
             ],
             

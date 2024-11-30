@@ -3,11 +3,11 @@
     // TODO: generate the confinurations
     "configurations": [
         {
-            "name": "rust/concepts/umbra_strings:concepts_umbra_strings_test",
+            "name": "rust/concepts/umbra_strings:test",
             "request": "launch",
             "type": "lldb",
 
-            // "preLaunchTask": "rust/concepts/umbra_strings:concepts_umbra_strings_test",
+            "preLaunchTask": "rust/concepts/umbra_strings:test",
 
             "program": "${workspaceFolder}/build/links/current_test.lnk",
             "cwd": "${workspaceFolder}",

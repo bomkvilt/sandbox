@@ -29,8 +29,7 @@ const SUFFIX_LENGTH: usize = size_of::<*const u8>();
 
 /// An owning Uumbra-styled string that does not share its bytes among different instances.
 #[allow(clippy::module_name_repetitions)]
-pub type BoxString<const PREFIX_LENGTH: usize = 4> =
-    UmbraString<_trailing::BoxDynBytes, PREFIX_LENGTH>;
+pub type BoxString<const PREFIX_LENGTH: usize> = UmbraString<_trailing::BoxDynBytes, PREFIX_LENGTH>;
 
 #[repr(C)]
 union Trailing<Bytes: _trailing::OwnedBytes> {
@@ -134,11 +133,11 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX
     }
 
     const fn is_prefix_only(&self) -> bool {
-        self.len() < PREFIX_LENGTH
+        self.len() <= PREFIX_LENGTH
     }
 
     const fn is_inlined(&self) -> bool {
-        self.len() < Self::INLINED_LENGTH
+        self.len() <= Self::INLINED_LENGTH
     }
 
     fn suffix(&self) -> &[u8] {
@@ -196,9 +195,12 @@ impl<B1: _trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
             // TODO: can it be eliminated?
             if lhs.is_inlined() && rhs.is_inlined() {
                 // case: XXX0 vs. XXXX -> less; (\0-padded)
-                // NOTE: suffix size is always the same
-                // NOTE: \0 cannot be a utf-8 rune
-                return unsafe { lhs.trailing.buf == rhs.trailing.buf };
+                // NOTE: suffix sizes are always the same
+                // NOTE: == brings wrong results in case of '\0'
+                if unsafe { lhs.trailing.buf != rhs.trailing.buf } {
+                    return false;
+                }
+                return lhs.len == rhs.len;
             }
             return lhs.suffix() == rhs.suffix();
         }
@@ -229,9 +231,12 @@ impl<B1: _trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
             if lhs.is_inlined() && rhs.is_inlined() {
                 // case: XXX0 vs. XXXX -> less; (\0-padded)
                 // NOTE: suffix size is always the same
-                // NOTE: \0 cannot be a utf-8 rune
+                // NOTE: == brings wrong results in case of '\0'
                 let suffix_ordering = unsafe { Ord::cmp(&lhs.trailing.buf, &rhs.trailing.buf) };
-                return suffix_ordering;
+                if suffix_ordering != cmp::Ordering::Equal {
+                    return suffix_ordering;
+                }
+                return Ord::cmp(&lhs.len, &rhs.len);
             }
             return Ord::cmp(lhs.suffix(), rhs.suffix());
         }
@@ -360,9 +365,7 @@ where
 }
 
 // =====================================
-// Eq
-
-// NOTE: Eq does not allow cmp strings of different inlined prefix lengths or byte types
+// Eq; self == self -> true
 
 impl<B1: _trailing::OwnedBytes, const L1: usize> Eq for UmbraString<B1, L1> {}
 

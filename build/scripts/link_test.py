@@ -1,4 +1,3 @@
-import os
 import pathlib
 import subprocess
 import sys
@@ -9,7 +8,12 @@ _, target, link = sys.argv
 
 # build the target
 subprocess.run(
-    " ".join(["bazelisk", "build", target]),
+    " ".join(
+        [
+            *["bazelisk", "build", target],
+            *["-c", "dbg"],
+        ]
+    ),
     shell=True,
     check=True,
 )
