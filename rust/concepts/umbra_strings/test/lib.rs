@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use quickcheck_macros::quickcheck;
+
 const SUFFIX_SIZE: usize = std::mem::size_of::<*const u8>();
 
 // NOTE: the sizes are intentionally avoiding the expected inlined length
@@ -31,7 +33,7 @@ macro_rules! generate_main_tests {
             fn test_construct_prefix_only() {
                 let expected = "1".repeat($N - 1);
                 std::assert_eq!(
-                    MyString::try_from(expected.as_str()).expect("").as_ref(),
+                    MyString::try_from(expected.as_str()).unwrap().as_ref(),
                     expected
                 );
             }
@@ -40,7 +42,7 @@ macro_rules! generate_main_tests {
             fn test_construct_inlined() {
                 let expected = "1".repeat(crate::inlined_length::<$N>());
                 std::assert_eq!(
-                    MyString::try_from(expected.as_str()).expect("").as_ref(),
+                    MyString::try_from(expected.as_str()).unwrap().as_ref(),
                     expected
                 );
             }
@@ -49,9 +51,21 @@ macro_rules! generate_main_tests {
             fn test_construct_allocated() {
                 let expected = "1".repeat(crate::allocated_length::<$N>());
                 std::assert_eq!(
-                    MyString::try_from(expected.as_str()).expect("").as_ref(),
+                    MyString::try_from(expected.as_str()).unwrap().as_ref(),
                     expected
                 );
+            }
+
+            #[crate::quickcheck]
+            fn test_debug(base: String) {
+                let test = MyString::try_from(&base).unwrap();
+                std::assert_eq!(std::format!("{test:?}"), std::format!("{base:?}"));
+            }
+
+            #[crate::quickcheck]
+            fn test_display(base: String) {
+                let test = MyString::try_from(&base).unwrap();
+                std::assert_eq!(std::format!("{test}"), std::format!("{base}"));
             }
         }
     };
@@ -74,43 +88,20 @@ macro_rules! generate_threaded_tests {
         mod $name {
             type MyString = concepts_umbra_strings::$type<$N>;
 
-            // TODO: impl theraded tests
-            #[test]
-            fn test_move_to_thread_inlined() {
-                let expected = "1".repeat(crate::inlined_length::<$N>());
-
-                let boxed = MyString::try_from(expected.as_str()).expect("");
+            #[crate::quickcheck]
+            fn test_move_to_thread(base: String) {
+                let test = MyString::try_from(base.as_str()).unwrap();
 
                 let handles: Vec<_> = (0..8)
                     .map(|_| {
-                        let boxed_cloned = boxed.clone();
-                        let expected_cloned = expected.clone();
-                        std::thread::spawn(move || assert_eq!(boxed_cloned, expected_cloned))
+                        let test_cloned = test.clone();
+                        let base_cloned = base.clone();
+                        std::thread::spawn(move || assert_eq!(test_cloned, base_cloned))
                     })
                     .collect();
 
                 for handle in handles {
-                    handle.join().expect("Thread finishes successfully");
-                }
-            }
-
-            // TODO: impl theraded tests
-            #[test]
-            fn test_move_to_thread_allocated() {
-                let expected = "1".repeat(crate::allocated_length::<$N>());
-
-                let boxed = MyString::try_from(expected.as_str()).expect("");
-
-                let handles: Vec<_> = (0..8)
-                    .map(|_| {
-                        let boxed_cloned = boxed.clone();
-                        let expected_cloned = expected.clone();
-                        std::thread::spawn(move || assert_eq!(boxed_cloned, expected_cloned))
-                    })
-                    .collect();
-
-                for handle in handles {
-                    handle.join().expect("Thread finishes successfully");
+                    handle.join().unwrap();
                 }
             }
         }
@@ -135,48 +126,83 @@ macro_rules! generate_cross_cmp_tests {
             type MyStringA = concepts_umbra_strings::$TypeA<$NA>;
             type MyStringB = concepts_umbra_strings::$TypeB<$NB>;
 
+            fn list_sizes() -> &'static [usize] {
+                static SIZES: [usize; 6] = [
+                    $NA, crate::inlined_length::<$NA>(), crate::allocated_length::<$NA>(),
+                    $NB, crate::inlined_length::<$NB>(), crate::allocated_length::<$NB>(),
+                ];
+                return &SIZES;
+            }
+
             #[test]
             fn test_eq() {
-                let assert = |size: usize| {
+                let assert_by_size = |size: usize| {
                     let value = "1".repeat(size);
-                    let str_a = MyStringA::try_from(&value).expect("");
-                    let str_b = MyStringB::try_from(&value).expect("");
+                    let str_a = MyStringA::try_from(&value).unwrap();
+                    let str_b = MyStringB::try_from(&value).unwrap();
                     assert_eq!(str_a, str_b);
                 };
-                assert(crate::inlined_length::<$NA>());
-                assert(crate::inlined_length::<$NB>());
-                assert(crate::allocated_length::<$NA>());
-                assert(crate::allocated_length::<$NB>());
+                for size in list_sizes() {
+                    assert_by_size(*size);
+                }
             }
 
             #[test]
             fn test_ne_with_trailing_null() {
-                let assert = |size: usize| {
-                    let lhs = "1".repeat(size);
+                let assert_by_size = |size: usize| {
+                    let lhs = "1".repeat(size - 1);
 
-                    let mut rhs = "1".repeat(size);
+                    let mut rhs = "1".repeat(size - 1);
                     rhs.push_str("\0");
 
-                    let str_a = MyStringA::try_from(&lhs).expect("");
-                    let str_b = MyStringB::try_from(&rhs).expect("");
+                    let str_a = MyStringA::try_from(&lhs).unwrap();
+                    let str_b = MyStringB::try_from(&rhs).unwrap();
 
-                    // all tests in one place
                     assert_ne!(lhs, rhs);
-                    assert_ne!(lhs, str_b);
-                    assert_ne!(str_a, rhs);
                     assert_ne!(str_a, str_b);
                 };
-                assert($NA - 1);
-                assert($NB - 1);
-                assert(crate::inlined_length::<$NA>() - 1);
-                assert(crate::inlined_length::<$NB>() - 1);
-                assert(crate::allocated_length::<$NA>() - 1);
-                assert(crate::allocated_length::<$NB>() - 1);
+                for size in list_sizes() {
+                    assert_by_size(*size);
+                }
             }
 
             #[test]
             fn test_cmp() {
-                //
+                let assert = |lhs: &str, rhs: &str| {
+                    let str_a = MyStringA::try_from(lhs).unwrap();
+                    let str_b = MyStringB::try_from(rhs).unwrap();
+
+                    assert_eq!(
+                        PartialOrd::partial_cmp(lhs, rhs),
+                        PartialOrd::partial_cmp(&str_a, &str_b)
+                    );
+                };
+                let assert_by_size = |size: usize| {
+                    // case: equal strings
+                    let lhs = "1".repeat(size);
+                    assert(&lhs, &lhs);
+
+                    // case: null-terminated
+                    let lhs = "1".repeat(size - 1);
+                    let mut rhs = "1".repeat(size - 1);
+                    rhs.push_str("\0");
+                    assert(&lhs, &rhs);
+                    assert(&rhs, &lhs);
+
+                    // case: less
+                    let lhs = "1".repeat(size);
+                    for i in 0..size {
+                        let mut rhs = "1".repeat(size);
+                        rhs.replace_range(i..i+1, "2");
+                        assert_eq!(lhs.len(), rhs.len());
+
+                        assert(&lhs, &rhs);
+                        assert(&rhs, &lhs);
+                    }
+                };
+                for size in list_sizes() {
+                    assert_by_size(*size);
+                }
             }
         }
     };

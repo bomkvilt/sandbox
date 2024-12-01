@@ -18,8 +18,10 @@ rust_test(
     ],
     proc_macro_deps = [
         "@crates//:paste",
+        "@crates//:quickcheck_macros",
     ],
     deps = [
         ":concepts_umbra_strings",
+        "@crates//:quickcheck",
     ],
 )
