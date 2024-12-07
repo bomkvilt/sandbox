@@ -460,3 +460,22 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraStrin
         PartialOrd::partial_cmp(self.as_bytes(), other.as_bytes())
     }
 }
+
+// :: UmbraString vs. String
+// NOTE: `String` cannot be automatically converted to the `str`
+
+impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<String>
+    for UmbraString<B, PREFIX_LENGTH>
+{
+    fn partial_cmp(&self, other: &String) -> Option<cmp::Ordering> {
+        PartialOrd::partial_cmp(self.as_bytes(), other.as_bytes())
+    }
+}
+
+impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraString<B, PREFIX_LENGTH>>
+    for String
+{
+    fn partial_cmp(&self, other: &UmbraString<B, PREFIX_LENGTH>) -> Option<cmp::Ordering> {
+        PartialOrd::partial_cmp(self.as_bytes(), other.as_bytes())
+    }
+}
