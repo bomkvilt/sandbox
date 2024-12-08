@@ -11,3 +11,8 @@ pub type BoxString<const PREFIX_LENGTH: usize = 4> =
 #[allow(clippy::module_name_repetitions)]
 pub type ArcString<const PREFIX_LENGTH: usize = 4> =
     _string::UmbraString<_trailing::ArcDynBytes, PREFIX_LENGTH>;
+
+/// An owning Umbra-styled string that shares its data among different instances using an plane ref counter.
+#[allow(clippy::module_name_repetitions)]
+pub type RcString<const PREFIX_LENGTH: usize = 4> =
+    _string::UmbraString<_trailing::RcDynBytes, PREFIX_LENGTH>;

@@ -37,7 +37,7 @@ impl quickcheck::Arbitrary for NullString {
 // NOTE: #[should_panic] does not support compile-time assets
 
 macro_rules! generate_main_tests {
-    ($name:ident, $type:ident, $N:expr) => {
+    (@format $name:ident, $type:ident, $N:expr) => {
         #[allow(non_snake_case)] // NOTE: e.g. main_tests_BoxString_04
         mod $name {
             type MyString = concepts_umbra_strings::$type<$N>;
@@ -131,22 +131,24 @@ macro_rules! generate_main_tests {
             }
         }
     };
-    ($type:ident) => {
+    (@unpack $type:ident) => {
         paste::paste! {
-            generate_main_tests!([<main_tests_ $type _04>], $type, 4);
-            generate_main_tests!([<main_tests_ $type _12>], $type, 12); // 4 + 8
-            generate_main_tests!([<main_tests_ $type _20>], $type, 20); // 4 + 16
-            generate_main_tests!([<main_tests_ $type _28>], $type, 28); // 4 + 24
+            generate_main_tests!(@format [<main_tests_ $type _04>], $type, 4);
+            generate_main_tests!(@format [<main_tests_ $type _12>], $type, 12); // 4 + 8
+            generate_main_tests!(@format [<main_tests_ $type _20>], $type, 20); // 4 + 16
+            generate_main_tests!(@format [<main_tests_ $type _28>], $type, 28); // 4 + 24
         }
     };
+    ([$($type:ident),+]) => {
+        $(generate_main_tests!(@unpack $type);)*
+    }
 }
-generate_main_tests!(BoxString);
-generate_main_tests!(ArcString);
+generate_main_tests!([ArcString, BoxString, RcString]);
 
 // // =========================================================
 
 macro_rules! generate_threaded_tests {
-    ($name:ident, $type:ident, $N:expr) => {
+    (@format $name:ident, $type:ident, $N:expr) => {
         #[allow(non_snake_case)] // NOTE: e.g. main_tests_BoxString_04
         mod $name {
             type MyString = concepts_umbra_strings::$type<$N>;
@@ -170,17 +172,19 @@ macro_rules! generate_threaded_tests {
             }
         }
     };
-    ($type:ident) => {
+    (@unpack $type:ident) => {
         paste::paste! {
-            generate_threaded_tests!([<threaded_tests_ $type _04>], $type, 4);
-            generate_threaded_tests!([<threaded_tests_ $type _12>], $type, 12); // 4 + 8
-            generate_threaded_tests!([<threaded_tests_ $type _20>], $type, 20); // 4 + 16
-            generate_threaded_tests!([<threaded_tests_ $type _28>], $type, 28); // 4 + 24
+            generate_threaded_tests!(@format [<threaded_tests_ $type _04>], $type, 4);
+            generate_threaded_tests!(@format [<threaded_tests_ $type _12>], $type, 12); // 4 + 8
+            generate_threaded_tests!(@format [<threaded_tests_ $type _20>], $type, 20); // 4 + 16
+            generate_threaded_tests!(@format [<threaded_tests_ $type _28>], $type, 28); // 4 + 24
         }
     };
+    ([$($type:ident),+]) => {
+        $(generate_threaded_tests!(@unpack $type);)*
+    }
 }
-generate_threaded_tests!(BoxString);
-generate_threaded_tests!(ArcString);
+generate_threaded_tests!([ArcString, BoxString]);
 
 // // =========================================================
 
@@ -283,4 +287,4 @@ macro_rules! generate_cross_tests {
         generate_cross_tests!(@unpack $Type x $N x $Type x $N);
     };
 }
-generate_cross_tests!([ArcString, BoxString] x [4, 12]);
+generate_cross_tests!([ArcString, BoxString, RcString] x [4, 12]);
