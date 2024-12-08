@@ -27,10 +27,6 @@ impl std::fmt::Display for Error {
 
 const SUFFIX_LENGTH: usize = size_of::<*const u8>();
 
-/// An owning Uumbra-styled string that does not share its bytes among different instances.
-#[allow(clippy::module_name_repetitions)]
-pub type BoxString<const PREFIX_LENGTH: usize> = UmbraString<_trailing::BoxDynBytes, PREFIX_LENGTH>;
-
 #[repr(C)]
 union Trailing<Bytes: _trailing::OwnedBytes> {
     buf: [u8; SUFFIX_LENGTH],

@@ -141,6 +141,7 @@ macro_rules! generate_main_tests {
     };
 }
 generate_main_tests!(BoxString);
+generate_main_tests!(ArcString);
 
 // // =========================================================
 
@@ -179,6 +180,7 @@ macro_rules! generate_threaded_tests {
     };
 }
 generate_threaded_tests!(BoxString);
+generate_threaded_tests!(ArcString);
 
 // // =========================================================
 
@@ -281,4 +283,4 @@ macro_rules! generate_cross_tests {
         generate_cross_tests!(@unpack $Type x $N x $Type x $N);
     };
 }
-generate_cross_tests!([BoxString] x [4, 12]);
+generate_cross_tests!([ArcString, BoxString] x [4, 12]);
