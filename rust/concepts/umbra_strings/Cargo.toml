@@ -4,8 +4,8 @@ edition = "2021"
 version = "0.1.0"
 
 [dependencies]
-paste = "1.0.15"
 
 [dev-dependencies]
+paste = "1.0.15"
 quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"

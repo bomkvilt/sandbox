@@ -1,4 +1,4 @@
-use crate::_trailing;
+use crate::trailing;
 use std::borrow::Borrow;
 use std::cmp;
 use std::mem::{align_of, size_of, ManuallyDrop};
@@ -28,7 +28,7 @@ impl std::fmt::Display for Error {
 const SUFFIX_LENGTH: usize = size_of::<*const u8>();
 
 #[repr(C)]
-union Trailing<Bytes: _trailing::OwnedBytes> {
+union Trailing<Bytes: trailing::OwnedBytes> {
     buf: [u8; SUFFIX_LENGTH],
     ptr: ManuallyDrop<Bytes>,
 }
@@ -36,7 +36,7 @@ union Trailing<Bytes: _trailing::OwnedBytes> {
 // NOTE: #[repr(C)] is required to make union poiners thin
 #[allow(clippy::module_name_repetitions)]
 #[repr(C)]
-pub struct UmbraString<Bytes: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> {
+pub struct UmbraString<Bytes: trailing::OwnedBytes, const PREFIX_LENGTH: usize> {
     len: u32,
     prefix: [u8; PREFIX_LENGTH],
     trailing: Trailing<Bytes>,
@@ -45,7 +45,7 @@ pub struct UmbraString<Bytes: _trailing::OwnedBytes, const PREFIX_LENGTH: usize>
 /**
  * Public operations
  */
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX_LENGTH> {
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX_LENGTH> {
     const INLINED_LENGTH: usize = PREFIX_LENGTH + SUFFIX_LENGTH;
 
     #[inline]
@@ -81,14 +81,14 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX
 /**
  * Byte operations.
  */
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX_LENGTH> {
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX_LENGTH> {
     fn new<S: AsRef<str>, A: FnOnce(S) -> B>(s: S, alloc: A) -> Result<Self, Error> {
         const {
             // NOTE: the sizes can be allowed by declining usage of the `trailing.buf` at such cases
             assert!(
                 (PREFIX_LENGTH - 4) % align_of::<Trailing<B>>() == 0,
                 "PREFIX_LENGTH is not properly aligned wich means that the layot contains a gap betwean the prefix and the trailing"
-            )
+            );
         };
         const { assert!(PREFIX_LENGTH < 256, "max prefix length is too large") };
 
@@ -170,8 +170,8 @@ fn cmp_prefix<const L1: usize, const L2: usize>(lhs: &[u8; L1], rhs: &[u8; L2]) 
 /**
  * Symmetic operations.
  */
-impl<B1: _trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
-    fn eq<B2: _trailing::OwnedBytes, const L2: usize>(
+impl<B1: trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
+    fn eq<B2: trailing::OwnedBytes, const L2: usize>(
         lhs: &UmbraString<B1, L1>,
         rhs: &UmbraString<B2, L2>,
     ) -> bool {
@@ -205,7 +205,7 @@ impl<B1: _trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
         return lhs.as_bytes() == rhs.as_bytes();
     }
 
-    fn cmp<B2: _trailing::OwnedBytes, const L2: usize>(
+    fn cmp<B2: trailing::OwnedBytes, const L2: usize>(
         lhs: &UmbraString<B1, L1>,
         rhs: &UmbraString<B2, L2>,
     ) -> cmp::Ordering {
@@ -247,13 +247,13 @@ impl<B1: _trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
 
 /// # Safety
 /// - Data is owned and immutable
-unsafe impl<B: _trailing::OwnedBytes + Send, const L1: usize> Send for UmbraString<B, L1> {}
+unsafe impl<B: trailing::OwnedBytes + Send, const L1: usize> Send for UmbraString<B, L1> {}
 
 /// # Safety
 /// - Data is owned and immutable
-unsafe impl<B: _trailing::OwnedBytes + Sync, const L1: usize> Sync for UmbraString<B, L1> {}
+unsafe impl<B: trailing::OwnedBytes + Sync, const L1: usize> Sync for UmbraString<B, L1> {}
 
-impl<B: _trailing::OwnedBytes, const L1: usize> Drop for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> Drop for UmbraString<B, L1> {
     fn drop(&mut self) {
         if !self.is_inlined() {
             unsafe { self.trailing.ptr.drop(self.len()) };
@@ -261,7 +261,7 @@ impl<B: _trailing::OwnedBytes, const L1: usize> Drop for UmbraString<B, L1> {
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> Clone for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> Clone for UmbraString<B, L1> {
     fn clone(&self) -> Self {
         let trailing = {
             if self.is_inlined() {
@@ -286,7 +286,7 @@ impl<B: _trailing::OwnedBytes, const L1: usize> Clone for UmbraString<B, L1> {
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> std::ops::Deref for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> std::ops::Deref for UmbraString<B, L1> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -294,31 +294,31 @@ impl<B: _trailing::OwnedBytes, const L1: usize> std::ops::Deref for UmbraString<
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> AsRef<str> for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> AsRef<str> for UmbraString<B, L1> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> Borrow<str> for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> Borrow<str> for UmbraString<B, L1> {
     fn borrow(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> std::hash::Hash for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> std::hash::Hash for UmbraString<B, L1> {
     fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
         self.as_str().hash(hasher);
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> std::fmt::Display for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> std::fmt::Display for UmbraString<B, L1> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> std::fmt::Debug for UmbraString<B, L1> {
+impl<B: trailing::OwnedBytes, const L1: usize> std::fmt::Debug for UmbraString<B, L1> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self.as_str())
     }
@@ -327,7 +327,7 @@ impl<B: _trailing::OwnedBytes, const L1: usize> std::fmt::Debug for UmbraString<
 // =====================================
 // TryFrom
 
-impl<B: _trailing::OwnedBytes, const L1: usize> TryFrom<&str> for UmbraString<B, L1>
+impl<B: trailing::OwnedBytes, const L1: usize> TryFrom<&str> for UmbraString<B, L1>
 where
     B: for<'a> From<&'a [u8]>,
 {
@@ -338,7 +338,7 @@ where
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> TryFrom<&String> for UmbraString<B, L1>
+impl<B: trailing::OwnedBytes, const L1: usize> TryFrom<&String> for UmbraString<B, L1>
 where
     B: for<'a> From<&'a [u8]>,
 {
@@ -349,7 +349,7 @@ where
     }
 }
 
-impl<B: _trailing::OwnedBytes, const L1: usize> TryFrom<String> for UmbraString<B, L1>
+impl<B: trailing::OwnedBytes, const L1: usize> TryFrom<String> for UmbraString<B, L1>
 where
     B: From<Vec<u8>>,
 {
@@ -363,14 +363,14 @@ where
 // =====================================
 // Eq; self == self -> true
 
-impl<B1: _trailing::OwnedBytes, const L1: usize> Eq for UmbraString<B1, L1> {}
+impl<B1: trailing::OwnedBytes, const L1: usize> Eq for UmbraString<B1, L1> {}
 
 // =====================================
 // PartialEq
 
 // :: UmbraString vs. UmbraString
 
-impl<B1: _trailing::OwnedBytes, B2: _trailing::OwnedBytes, const L1: usize, const L2: usize>
+impl<B1: trailing::OwnedBytes, B2: trailing::OwnedBytes, const L1: usize, const L2: usize>
     PartialEq<UmbraString<B2, L2>> for UmbraString<B1, L1>
 {
     fn eq(&self, other: &UmbraString<B2, L2>) -> bool {
@@ -380,7 +380,7 @@ impl<B1: _trailing::OwnedBytes, B2: _trailing::OwnedBytes, const L1: usize, cons
 
 // :: UmbraString vs. str
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<str>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<str>
     for UmbraString<B, PREFIX_LENGTH>
 {
     fn eq(&self, other: &str) -> bool {
@@ -388,7 +388,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<str>
     }
 }
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<UmbraString<B, PREFIX_LENGTH>>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<UmbraString<B, PREFIX_LENGTH>>
     for str
 {
     fn eq(&self, other: &UmbraString<B, PREFIX_LENGTH>) -> bool {
@@ -399,7 +399,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<UmbraString
 // :: UmbraString vs. String
 // NOTE: `String` cannot be automatically converted to the `str`
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<String>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<String>
     for UmbraString<B, PREFIX_LENGTH>
 {
     fn eq(&self, other: &String) -> bool {
@@ -407,7 +407,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<String>
     }
 }
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<UmbraString<B, PREFIX_LENGTH>>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<UmbraString<B, PREFIX_LENGTH>>
     for String
 {
     fn eq(&self, other: &UmbraString<B, PREFIX_LENGTH>) -> bool {
@@ -420,7 +420,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialEq<UmbraString
 
 // NOTE: Ord does not allow cmp strings of different inlined prefix lengths or byte types
 
-impl<B1: _trailing::OwnedBytes, const L1: usize> Ord for UmbraString<B1, L1> {
+impl<B1: trailing::OwnedBytes, const L1: usize> Ord for UmbraString<B1, L1> {
     fn cmp(&self, other: &UmbraString<B1, L1>) -> cmp::Ordering {
         Self::cmp(self, other)
     }
@@ -431,7 +431,7 @@ impl<B1: _trailing::OwnedBytes, const L1: usize> Ord for UmbraString<B1, L1> {
 
 // :: UmbraString vs. UmbraString
 
-impl<B1: _trailing::OwnedBytes, B2: _trailing::OwnedBytes, const L1: usize, const L2: usize>
+impl<B1: trailing::OwnedBytes, B2: trailing::OwnedBytes, const L1: usize, const L2: usize>
     PartialOrd<UmbraString<B2, L2>> for UmbraString<B1, L1>
 {
     fn partial_cmp(&self, other: &UmbraString<B2, L2>) -> Option<cmp::Ordering> {
@@ -441,7 +441,7 @@ impl<B1: _trailing::OwnedBytes, B2: _trailing::OwnedBytes, const L1: usize, cons
 
 // :: UmbraString vs. str
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<str>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<str>
     for UmbraString<B, PREFIX_LENGTH>
 {
     fn partial_cmp(&self, other: &str) -> Option<cmp::Ordering> {
@@ -449,7 +449,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<str>
     }
 }
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraString<B, PREFIX_LENGTH>>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraString<B, PREFIX_LENGTH>>
     for str
 {
     fn partial_cmp(&self, other: &UmbraString<B, PREFIX_LENGTH>) -> Option<cmp::Ordering> {
@@ -460,7 +460,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraStrin
 // :: UmbraString vs. String
 // NOTE: `String` cannot be automatically converted to the `str`
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<String>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<String>
     for UmbraString<B, PREFIX_LENGTH>
 {
     fn partial_cmp(&self, other: &String) -> Option<cmp::Ordering> {
@@ -468,7 +468,7 @@ impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<String>
     }
 }
 
-impl<B: _trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraString<B, PREFIX_LENGTH>>
+impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> PartialOrd<UmbraString<B, PREFIX_LENGTH>>
     for String
 {
     fn partial_cmp(&self, other: &UmbraString<B, PREFIX_LENGTH>) -> Option<cmp::Ordering> {

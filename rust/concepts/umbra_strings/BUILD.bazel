@@ -5,10 +5,19 @@ package(default_visibility = ["//visibility:public"])
 rust_library(
     name = "concepts_umbra_strings",
     srcs = [
-        "src/_string.rs",
-        "src/_trailing.rs",
         "src/lib.rs",
+        "src/string.rs",
+        "src/trailing/as_arc.rs",
+        "src/trailing/as_box.rs",
+        "src/trailing/as_rc.rs",
+        "src/trailing/mod.rs",
+        "src/trailing/traits.rs",
     ],
+)
+
+rust_test(
+    name = "ut",
+    crate = ":concepts_umbra_strings"
 )
 
 rust_test(
