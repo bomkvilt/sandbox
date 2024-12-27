@@ -46,7 +46,10 @@ crate.from_cargo(
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",
-        "//rust/basics/00.hellow_world:Cargo.toml"
+        # NOTE: list all the rust modules
+        # SA: ./Cargo.toml
+        "//rust/basics/00.hellow_world:Cargo.toml",
+        "//rust/concepts/umbra_strings:Cargo.toml",
     ],
 )
 use_repo(crate, "crates")

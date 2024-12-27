@@ -1,6 +1,8 @@
 [workspace]
 members = [
+  # SA: ./MODULE.bazel
   "rust/basics/00.hellow_world",
+  "rust/concepts/umbra_strings",
 ]
 
 [profile.release]

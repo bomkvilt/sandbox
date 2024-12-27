@@ -1,0 +1,36 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+package(default_visibility = ["//visibility:public"])
+
+rust_library(
+    name = "concepts_umbra_strings",
+    srcs = [
+        "src/lib.rs",
+        "src/string.rs",
+        "src/trailing/as_arc.rs",
+        "src/trailing/as_box.rs",
+        "src/trailing/as_rc.rs",
+        "src/trailing/mod.rs",
+        "src/trailing/traits.rs",
+    ],
+)
+
+rust_test(
+    name = "ut",
+    crate = ":concepts_umbra_strings"
+)
+
+rust_test(
+    name = "test",
+    srcs = [
+        "test/lib.rs",
+    ],
+    proc_macro_deps = [
+        "@crates//:paste",
+        "@crates//:quickcheck_macros",
+    ],
+    deps = [
+        ":concepts_umbra_strings",
+        "@crates//:quickcheck",
+    ],
+)

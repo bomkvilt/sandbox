@@ -1,1 +1,5 @@
-max_width = 120
+combine_control_expr = false
+format_macro_bodies = true
+format_macro_matchers = true
+indent_style = "Block"
+max_width = 100
