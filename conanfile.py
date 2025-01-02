@@ -1,8 +1,9 @@
 import sys
 from typing import Final
 
-import conan
-import conan.tools.google
+import conan  # type: ignore
+import conan.tools.google  # type: ignore
+
 
 print(f"using typthon version: {sys.version}")
 
@@ -26,6 +27,6 @@ class Conan(conan.ConanFile):
         self.folders.generators = "build/conan"
         conan.tools.google.bazel_layout(self)
 
-    def generate(self):
+    def generate(self) -> None:
         bazel_deps: Final = conan.tools.google.BazelDeps(self)
         bazel_deps.generate()

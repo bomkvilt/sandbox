@@ -1,8 +1,13 @@
 {
+    "files.exclude": {
+        // hide bazel temporary directories
+        "bazel-*": true,
+        "external": true,
+        "target": true,
+    },
+
+    // language-specific anctions and auto-formatters
     "[python]": {
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-        },
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
     },
@@ -12,7 +17,9 @@
     },
     "editor.defaultFormatter": "ms-python.black-formatter",
     "notebook.defaultFormatter": "ms-python.black-formatter",
+
+    // language: python
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.typeCheckingMode": "standard",
     "python.defaultInterpreterPath": "./.venv/bin/python3.12",
 }

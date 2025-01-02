@@ -5,6 +5,7 @@
 
 # rust
 /rust-project.json
+/target
 
 # bazel build
 /bazel-*

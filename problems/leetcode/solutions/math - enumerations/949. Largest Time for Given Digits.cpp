@@ -1,8 +1,12 @@
+#include <vector>
+#include <string>
+
+
 class Solution {
 public:
-    string largestTimeFromDigits(const vector<int>& arr) 
+    std::string largestTimeFromDigits(const std::vector<int>& arr) 
     {
-        auto idx = vector<int>();
+        auto idx = std::vector<int>();
         auto ans = std::vector<std::array<int, 2>>();
         GenerateHours(arr, idx, ans);
         
@@ -29,8 +33,8 @@ public:
         return (hh.size() < 2 ? '0' + hh : hh) + ":" 
             +  (mm.size() < 2 ? '0' + mm : mm);
     }
-    
-    void GenerateHours(const vector<int>& arr, vector<int>& idx, std::vector<std::array<int, 2>>& ans)
+
+    void GenerateHours(const std::vector<int>& arr, std::vector<int>& idx, std::vector<std::array<int, 2>>& ans)
     {
         if (idx.size() == arr.size())
         {
@@ -47,7 +51,7 @@ public:
                 ans.push_back({hh, mm});
             }
         }
-        
+
         for (int i = 0; i < arr.size(); ++i)
         {
             if (std::find(idx.begin(), idx.end(), i) != idx.end())
