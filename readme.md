@@ -18,7 +18,7 @@ To configure them all:
 * Setup a build environment:
 
   ```sh
-  python ./tools/setup/setup.py
+  python ./build/setup/setup.py
   ```
 
 * Generate compile commands:

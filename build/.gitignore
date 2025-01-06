@@ -1,0 +1,6 @@
+# conan-related directories
+/conan
+/conan-profiles
+
+# vs-code-related directories
+/links

@@ -1,13 +1,14 @@
 import sys
-from typing import Final
+from typing import Final, final
 
 import conan  # type: ignore
 import conan.tools.google  # type: ignore
 
 
-print(f"using typthon version: {sys.version}")
+print(f"used python version: {sys.version}")
 
 
+@final
 class Conan(conan.ConanFile):
     settings: Final = ("os", "compiler", "build_type", "arch")
 

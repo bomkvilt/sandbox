@@ -9,9 +9,6 @@
 
 # bazel build
 /bazel-*
-/build/conan
-/build/conan-profiles
-/build/links
 
 # built targets linked to source make files
 *.built.link

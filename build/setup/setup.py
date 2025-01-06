@@ -66,7 +66,7 @@ class _Setup:
 
     def setup_bazel(self) -> None:
         subprocess.run(
-            ["bazelisk", "build", "tools/setup/_dummy"],
+            ["bazelisk", "build", "build/setup/_dummy"],
             capture_output=False,
             check=True,
         )

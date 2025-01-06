@@ -18,7 +18,11 @@ impl Greeter {
         let resource = runfiles::Runfiles::create()?;
         Ok(Greeter {
             greeting: std::fs::read_to_string(
-                runfiles::rlocation!(resource, "sandbox/rust/basics/00.hellow_world/data/greeting.txt").unwrap(),
+                runfiles::rlocation!(
+                    resource,
+                    "sandbox/rust/basics/00.hellow_world/data/greeting.txt"
+                )
+                .unwrap(),
             )
             .map_err(runfiles::RunfilesError::RunfileIoError)?,
         })
