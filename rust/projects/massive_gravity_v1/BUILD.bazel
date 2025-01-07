@@ -1,0 +1,26 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+rust_binary(
+    name = "bin",
+    srcs = [
+        "src/components/circles/mod.rs",
+        "src/components/mod.rs",
+        "src/main.rs",
+        "src/physics/mod.rs",
+        "src/ui/mod.rs",
+    ],
+    data = [
+        "src/components/circles/shader.wgsl"
+    ],
+    deps = [
+        "@crates//:bytemuck",
+        "@crates//:env_logger",
+        "@crates//:log",
+        "@crates//:pollster",
+        "@crates//:wgpu",
+        "@crates//:winit",
+        "@rules_rust//tools/runfiles",
+    ],
+)

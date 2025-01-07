@@ -1,0 +1,19 @@
+[package]
+name = "massive_gravity_v1"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+
+# graphics
+wgpu = "23.0.1"
+wgpu-types = "23.0.0"
+winit = "0.30.8"
+
+# other
+bytemuck = "1.21.0"
+env_logger = "0.11.6"
+log = "0.4.22"
+pollster = "0.4.0"
+
+[dev-dependencies]

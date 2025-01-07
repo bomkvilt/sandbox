@@ -51,6 +51,7 @@ crate.from_cargo(
         "//rust/basics/00.hellow_world:Cargo.toml",
         "//rust/concepts/comp_for_macro:Cargo.toml",
         "//rust/concepts/umbra_strings:Cargo.toml",
+        "//rust/projects/massive_gravity_v1:Cargo.toml"
     ],
 )
 use_repo(crate, "crates")
