@@ -1,6 +1,7 @@
 // TODO: remove the pragmas
 #![allow(dead_code, unused_variables, unused_mut, clippy::unused_self)]
 
+use std::ops::DerefMut;
 use std::sync::Arc;
 use winit::dpi::PhysicalSize;
 use winit::event::WindowEvent;
@@ -9,7 +10,6 @@ use winit::window::{Window, WindowId};
 
 mod components;
 
-#[derive(Debug)]
 struct State {
     window: Arc<Window>,
     device: wgpu::Device,
@@ -17,7 +17,7 @@ struct State {
     config: wgpu::SurfaceConfiguration,
     queue: Arc<wgpu::Queue>,
 
-    view: components::view::Controller,
+    camera: Arc<components::camera::Camera>,
     circles: components::circles::Collection,
     circles_pipeline: components::circles::Pipeline,
 }
@@ -75,10 +75,10 @@ impl State {
             .unwrap();
         surface.configure(&device, &config);
 
-        let view = components::view::Controller::new(queue.clone(), &device);
+        let camera = Arc::new(components::camera::Camera::new(queue.clone(), &device));
 
         let circles_pipeline =
-            components::circles::Pipeline::new(&device, &surface, &config, &view);
+            components::circles::Pipeline::new(&device, &surface, &config, camera.clone());
 
         let mut circles = components::circles::Collection::new(queue.clone(), &device);
         circles.set_instances(&[
@@ -110,7 +110,7 @@ impl State {
             surface,
             config,
             queue,
-            view,
+            camera,
             circles,
             circles_pipeline,
         }
@@ -123,8 +123,12 @@ impl State {
         self.surface.configure(&self.device, &self.config);
 
         // Update viewport size
-        self.view.set_size(self.config.width, self.config.height);
-        self.view.sync();
+        {
+            let mut guard = self.camera.view.lock().unwrap();
+            guard.deref_mut().x = self.config.width;
+            guard.deref_mut().y = self.config.height;
+        }
+        self.camera.sync();
 
         // On macos the window needs to be redrawn manually after resizing
         self.window.request_redraw();
@@ -160,8 +164,8 @@ impl State {
                 occlusion_query_set: None,
             });
 
-            rpass.set_pipeline(self.circles_pipeline.pipeline());
-            rpass.set_bind_group(0, self.view.bind(), &[]);
+            self.circles_pipeline.snap_to_pass(&mut rpass);
+            self.camera.snap_to_pass(&mut rpass);
             self.circles.render(&mut rpass);
         }
 
@@ -173,13 +177,15 @@ impl State {
 // =================================================================================================
 
 #[derive(Default)]
-struct App {
+struct Application {
     state: Option<State>,
     window: Option<Arc<Window>>,
 }
 
-impl App {
+impl Application {
     fn state(&mut self) -> &mut State {
+        // NOTE: It could be wrong, but if we create the state instantly after the window
+        // the frame can have incorrect surface rendering: =~ negative paddings
         if self.state.is_none() {
             let window = self.window.as_ref().unwrap().clone();
             self.state = Some(pollster::block_on(State::new(window)));
@@ -188,7 +194,7 @@ impl App {
     }
 }
 
-impl winit::application::ApplicationHandler for App {
+impl winit::application::ApplicationHandler for Application {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         log::error!("call: resume");
         let window = event_loop
@@ -222,6 +228,6 @@ pub fn main() {
     event_loop.set_control_flow(ControlFlow::Poll);
     event_loop.set_control_flow(ControlFlow::Wait);
 
-    let mut app = App::default();
+    let mut app = Application::default();
     let _ = event_loop.run_app(&mut app);
 }

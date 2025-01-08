@@ -5,9 +5,9 @@ package(default_visibility = ["//visibility:public"])
 rust_binary(
     name = "bin",
     srcs = [
+        "src/components/camera.rs",
         "src/components/circles/mod.rs",
         "src/components/mod.rs",
-        "src/components/view.rs",
         "src/main.rs",
         "src/physics/mod.rs",
         "src/ui/mod.rs",
@@ -15,11 +15,16 @@ rust_binary(
     data = [
         "src/components/circles/shader.wgsl"
     ],
+    proc_macro_deps = [
+        "@crates//:bytemuck_derive",
+    ],
     deps = [
         "@crates//:bytemuck",
+        "@crates//:derive_builder",
         "@crates//:env_logger",
         "@crates//:log",
         "@crates//:pollster",
+        "@crates//:static_assertions",
         "@crates//:wgpu",
         "@crates//:winit",
         "@rules_rust//tools/runfiles",

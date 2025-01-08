@@ -1,2 +1,2 @@
+pub mod camera;
 pub mod circles;
-pub mod view;

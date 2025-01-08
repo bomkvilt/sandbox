@@ -16,7 +16,7 @@ impl Instance {
     const ATTRIBS: [wgpu::VertexAttribute; 3] =
         wgpu::vertex_attr_array![0 => Float32x2, 1 => Float32, 2 => Unorm8x4];
 
-    fn desc<'a>() -> wgpu::VertexBufferLayout<'a> {
+    fn device_layout<'a>() -> wgpu::VertexBufferLayout<'a> {
         wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Instance>() as wgpu::BufferAddress,
             step_mode: wgpu::VertexStepMode::Instance,
@@ -38,15 +38,18 @@ pub struct Collection {
 }
 
 impl Collection {
+    /// `instances` are the first extra buffer
+    const SLOT: u32 = 0;
+
     pub fn new(queue: Arc<wgpu::Queue>, device: &wgpu::Device) -> Self {
         Self {
             queue,
             buffer: device.create_buffer(&wgpu::BufferDescriptor {
-                label: Some("Instance Buffer"),
+                label: Some("circles.buffer"),
                 usage: wgpu::BufferUsages::STORAGE
                     | wgpu::BufferUsages::VERTEX
                     | wgpu::BufferUsages::COPY_DST,
-                size: 1 << 28,
+                size: 1 << 28, // TODO: use more explict magic constant
                 mapped_at_creation: false,
             }),
             count: 0u32,
@@ -54,9 +57,8 @@ impl Collection {
     }
 
     pub fn render(&self, rpass: &mut wgpu::RenderPass<'_>) {
-        log::error!("render: count: {0}", self.count);
-        rpass.set_vertex_buffer(0, self.buffer.slice(..));
-        rpass.draw(0..3, 0..self.count);
+        rpass.set_vertex_buffer(Self::SLOT, self.buffer.slice(..));
+        rpass.draw(0..3, 0..self.count); // render triangles
     }
 
     pub fn set_instances(&mut self, instances: &[Instance]) {
@@ -70,7 +72,12 @@ impl Collection {
 
 #[derive(Debug)]
 pub struct Pipeline {
-    render_pipeline: wgpu::RenderPipeline,
+    pipeline: wgpu::RenderPipeline,
+
+    /// The `camera` is required here as the `pipiline` uses the `camera`'s buffers and the `camera`
+    /// must overlive the `pipiline`. Thus, the field should be located below the `pipline`
+    /// <https://doc.rust-lang.org/reference/destructors.html#r-destructors.operation>
+    camera: Arc<super::camera::Camera>,
 }
 
 impl Pipeline {
@@ -78,7 +85,7 @@ impl Pipeline {
         device: &wgpu::Device,
         surface: &wgpu::Surface,
         config: &wgpu::SurfaceConfiguration,
-        view: &super::view::Controller,
+        camera: Arc<super::camera::Camera>,
     ) -> Self {
         // Load the shader from disk
         let shader_file = runfiles::rlocation!(
@@ -94,19 +101,19 @@ impl Pipeline {
 
         let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: None,
-            bind_group_layouts: &[view.layout()],
+            bind_group_layouts: &[camera.get_layout()],
             push_constant_ranges: &[],
         });
 
         #[allow(clippy::default_trait_access)]
-        let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("circle pipeline"),
+        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("circles.pipeline"),
             layout: Some(&layout),
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: Some("vs_main"),
                 compilation_options: Default::default(),
-                buffers: &[Instance::desc()],
+                buffers: &[Instance::device_layout()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
@@ -125,10 +132,10 @@ impl Pipeline {
             cache: None,
         });
 
-        Self { render_pipeline }
+        Self { pipeline, camera }
     }
 
-    pub fn pipeline(&self) -> &wgpu::RenderPipeline {
-        &self.render_pipeline
+    pub fn snap_to_pass(&self, rpass: &mut wgpu::RenderPass<'_>) {
+        rpass.set_pipeline(&self.pipeline);
     }
 }
