@@ -7,6 +7,7 @@ rust_binary(
     srcs = [
         "src/components/circles/mod.rs",
         "src/components/mod.rs",
+        "src/components/view.rs",
         "src/main.rs",
         "src/physics/mod.rs",
         "src/ui/mod.rs",

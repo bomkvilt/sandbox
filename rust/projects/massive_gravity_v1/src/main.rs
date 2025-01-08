@@ -1,6 +1,7 @@
+// TODO: remove the pragmas
+#![allow(dead_code, unused_variables, unused_mut, clippy::unused_self)]
+
 use std::sync::Arc;
-use wgpu::{Device, InstanceDescriptor, InstanceFlags, Queue, Surface, SurfaceConfiguration};
-use winit::application::ApplicationHandler;
 use winit::dpi::PhysicalSize;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
@@ -8,13 +9,15 @@ use winit::window::{Window, WindowId};
 
 mod components;
 
+#[derive(Debug)]
 struct State {
     window: Arc<Window>,
-    device: Device,
-    surface: Surface<'static>,
-    config: SurfaceConfiguration,
-    queue: Arc<Queue>,
+    device: wgpu::Device,
+    surface: wgpu::Surface<'static>,
+    config: wgpu::SurfaceConfiguration,
+    queue: Arc<wgpu::Queue>,
 
+    view: components::view::Controller,
     circles: components::circles::Collection,
     circles_pipeline: components::circles::Pipeline,
 }
@@ -26,15 +29,19 @@ impl State {
         size.width = size.width.max(1);
         size.height = size.height.max(1);
 
+        log::error!("new size: {size:?}");
+
         // TODO: use `wgpu::util::instance_descriptor_from_env()`
-        let instance = wgpu::Instance::new(InstanceDescriptor {
+        #[allow(clippy::default_trait_access)]
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends: wgpu::util::backend_bits_from_env().unwrap_or_default(),
-            flags: InstanceFlags::from_build_config().with_env(),
-            dx12_shader_compiler: wgpu::util::dx12_shader_compiler_from_env().unwrap_or_default(),
-            gles_minor_version: wgpu::util::gles_minor_version_from_env().unwrap_or_default(),
+            dx12_shader_compiler: Default::default(),
+            gles_minor_version: Default::default(),
+            flags: Default::default(),
         });
 
         let surface = instance.create_surface(window.clone()).unwrap();
+
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::default(),
@@ -68,7 +75,10 @@ impl State {
             .unwrap();
         surface.configure(&device, &config);
 
-        let circles_pipeline = components::circles::Pipeline::new(&device, &surface, &adapter);
+        let view = components::view::Controller::new(queue.clone(), &device);
+
+        let circles_pipeline =
+            components::circles::Pipeline::new(&device, &surface, &config, &view);
 
         let mut circles = components::circles::Collection::new(queue.clone(), &device);
         circles.set_instances(&[
@@ -100,6 +110,7 @@ impl State {
             surface,
             config,
             queue,
+            view,
             circles,
             circles_pipeline,
         }
@@ -110,6 +121,10 @@ impl State {
         self.config.width = new_size.width.max(1);
         self.config.height = new_size.height.max(1);
         self.surface.configure(&self.device, &self.config);
+
+        // Update viewport size
+        self.view.set_size(self.config.width, self.config.height);
+        self.view.sync();
 
         // On macos the window needs to be redrawn manually after resizing
         self.window.request_redraw();
@@ -144,7 +159,9 @@ impl State {
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
+
             rpass.set_pipeline(self.circles_pipeline.pipeline());
+            rpass.set_bind_group(0, self.view.bind(), &[]);
             self.circles.render(&mut rpass);
         }
 
@@ -153,18 +170,31 @@ impl State {
     }
 }
 
+// =================================================================================================
+
 #[derive(Default)]
 struct App {
     state: Option<State>,
+    window: Option<Arc<Window>>,
 }
 
-impl ApplicationHandler for App {
+impl App {
+    fn state(&mut self) -> &mut State {
+        if self.state.is_none() {
+            let window = self.window.as_ref().unwrap().clone();
+            self.state = Some(pollster::block_on(State::new(window)));
+        }
+        return self.state.as_mut().unwrap();
+    }
+}
+
+impl winit::application::ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         log::error!("call: resume");
         let window = event_loop
             .create_window(Window::default_attributes())
             .unwrap();
-        self.state = Some(pollster::block_on(State::new(window.into())));
+        self.window = Some(window.into());
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
@@ -174,16 +204,10 @@ impl ApplicationHandler for App {
                 event_loop.exit();
             }
             WindowEvent::Resized(new_size) => {
-                self.state
-                    .as_mut()
-                    .expect("resumed was not called")
-                    .resize(new_size);
+                self.state().resize(new_size);
             }
             WindowEvent::RedrawRequested => {
-                self.state
-                    .as_mut()
-                    .expect("resumed was not called")
-                    .redraw();
+                self.state().redraw();
             }
             _ => (),
         }

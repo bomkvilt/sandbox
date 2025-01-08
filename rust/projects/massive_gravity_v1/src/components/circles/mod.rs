@@ -1,3 +1,6 @@
+// TODO: remove the pragmas
+#![allow(dead_code, unused_variables, unused_mut, clippy::unused_self)]
+
 use std::borrow::Cow;
 use std::sync::Arc;
 
@@ -51,6 +54,7 @@ impl Collection {
     }
 
     pub fn render(&self, rpass: &mut wgpu::RenderPass<'_>) {
+        log::error!("render: count: {0}", self.count);
         rpass.set_vertex_buffer(0, self.buffer.slice(..));
         rpass.draw(0..3, 0..self.count);
     }
@@ -70,7 +74,12 @@ pub struct Pipeline {
 }
 
 impl Pipeline {
-    pub fn new(device: &wgpu::Device, surface: &wgpu::Surface, adapter: &wgpu::Adapter) -> Self {
+    pub fn new(
+        device: &wgpu::Device,
+        surface: &wgpu::Surface,
+        config: &wgpu::SurfaceConfiguration,
+        view: &super::view::Controller,
+    ) -> Self {
         // Load the shader from disk
         let shader_file = runfiles::rlocation!(
             runfiles::Runfiles::create().unwrap(),
@@ -83,30 +92,31 @@ impl Pipeline {
             )),
         });
 
-        let swapchain_capabilities = surface.get_capabilities(adapter);
-        let swapchain_format = swapchain_capabilities.formats[0];
-
         let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: None,
-            bind_group_layouts: &[],
+            bind_group_layouts: &[view.layout()],
             push_constant_ranges: &[],
         });
 
         #[allow(clippy::default_trait_access)]
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: None,
+            label: Some("circle pipeline"),
             layout: Some(&layout),
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: Some("vs_main"),
-                buffers: &[Instance::desc()],
                 compilation_options: Default::default(),
+                buffers: &[Instance::desc()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: Some("fs_main"),
                 compilation_options: Default::default(),
-                targets: &[Some(swapchain_format.into())],
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: config.format,
+                    blend: Some(wgpu::BlendState::REPLACE),
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
             }),
             primitive: wgpu::PrimitiveState::default(),
             depth_stencil: None,
