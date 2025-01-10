@@ -52,9 +52,7 @@ impl From<Vec<u8>> for ArcDynBytes {
 impl From<&[u8]> for ArcDynBytes {
     fn from(bytes: &[u8]) -> Self {
         if bytes.is_empty() {
-            return Self {
-                ptr: NonNull::dangling(),
-            };
+            return Self { ptr: NonNull::dangling() };
         }
 
         let layout = Self::layout(bytes.len());
@@ -69,19 +67,14 @@ impl From<&[u8]> for ArcDynBytes {
         // NOTE: we have just allocated a required memory strip
         // NOTE: I cannot explain why `fat_ptr.as_mut()` cannot be used here
         unsafe {
-            std::ptr::write(
-                std::ptr::addr_of_mut!((*fat_ptr.as_ptr()).count),
-                AtomicUsize::new(1),
-            );
+            std::ptr::write(std::ptr::addr_of_mut!((*fat_ptr.as_ptr()).count), AtomicUsize::new(1));
             std::ptr::copy_nonoverlapping(
                 bytes.as_ptr(),
                 std::ptr::addr_of_mut!((*fat_ptr.as_ptr()).data).cast(),
                 bytes.len(),
             );
         }
-        Self {
-            ptr: fat_ptr.cast(),
-        }
+        Self { ptr: fat_ptr.cast() }
     }
 }
 

@@ -9,9 +9,7 @@ pub struct Greeter {
 impl Greeter {
     #[must_use]
     pub fn new(greeting: &str) -> Greeter {
-        Greeter {
-            greeting: greeting.to_string(),
-        }
+        Greeter { greeting: greeting.to_string() }
     }
 
     pub fn from_resource_file() -> runfiles::Result<Greeter> {

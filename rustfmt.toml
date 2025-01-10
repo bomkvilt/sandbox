@@ -1,5 +1,11 @@
+# line width
+max_width = 100
+use_small_heuristics = "Max"
+
+# code blocks
+imports_granularity = "Module"
+indent_style = "Block"
+
 combine_control_expr = false
 format_macro_bodies = true
 format_macro_matchers = true
-indent_style = "Block"
-max_width = 100

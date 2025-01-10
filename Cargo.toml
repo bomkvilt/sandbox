@@ -1,7 +1,8 @@
 [workspace]
 members = [
-  # SA: ./MODULE.bazel
+  # NOTE: should also be mentioned at the `./MODULE.bazel`
   "rust/basics/00.hellow_world",
+  "rust/concepts/comp_for_macro",
   "rust/concepts/umbra_strings",
 ]
 

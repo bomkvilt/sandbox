@@ -1,5 +1,12 @@
 {
     "files.exclude": {
+        // hide: python
+        ".mypy_cache": true,
+        ".venv": true,
+
+        // hide: rust
+        ".cache": true,
+
         // hide bazel temporary directories
         "bazel-*": true,
         "external": true,
@@ -22,4 +29,7 @@
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "standard",
     "python.defaultInterpreterPath": "./.venv/bin/python3.12",
+
+    // language: rust
+    "rust-analyzer.diagnostics.styleLints.enable": true,
 }

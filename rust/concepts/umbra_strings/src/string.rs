@@ -114,18 +114,12 @@ impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX_
                 Trailing { buf }
             } else {
                 prefix.copy_from_slice(&data[..PREFIX_LENGTH]);
-                Trailing {
-                    ptr: ManuallyDrop::new(alloc(s)),
-                }
+                Trailing { ptr: ManuallyDrop::new(alloc(s)) }
             }
         };
 
         #[allow(clippy::cast_possible_truncation)]
-        Ok(Self {
-            len: size as u32,
-            prefix,
-            trailing,
-        })
+        Ok(Self { len: size as u32, prefix, trailing })
     }
 
     const fn is_prefix_only(&self) -> bool {
@@ -141,12 +135,7 @@ impl<B: trailing::OwnedBytes, const PREFIX_LENGTH: usize> UmbraString<B, PREFIX_
             let suffix_len = self.len().saturating_sub(PREFIX_LENGTH);
             unsafe { self.trailing.buf.get_unchecked(..suffix_len) }
         } else {
-            unsafe {
-                self.trailing
-                    .ptr
-                    .as_bytes(self.len())
-                    .get_unchecked(PREFIX_LENGTH..)
-            }
+            unsafe { self.trailing.ptr.as_bytes(self.len()).get_unchecked(PREFIX_LENGTH..) }
         }
     }
 }
@@ -265,24 +254,12 @@ impl<B: trailing::OwnedBytes, const L1: usize> Clone for UmbraString<B, L1> {
     fn clone(&self) -> Self {
         let trailing = {
             if self.is_inlined() {
-                unsafe {
-                    Trailing {
-                        buf: self.trailing.buf,
-                    }
-                }
+                unsafe { Trailing { buf: self.trailing.buf } }
             } else {
-                unsafe {
-                    Trailing {
-                        ptr: ManuallyDrop::new(self.trailing.ptr.clone(self.len())),
-                    }
-                }
+                unsafe { Trailing { ptr: ManuallyDrop::new(self.trailing.ptr.clone(self.len())) } }
             }
         };
-        Self {
-            len: self.len,
-            prefix: self.prefix,
-            trailing,
-        }
+        Self { len: self.len, prefix: self.prefix, trailing }
     }
 }
 

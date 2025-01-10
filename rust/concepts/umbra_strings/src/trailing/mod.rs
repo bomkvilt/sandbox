@@ -8,5 +8,4 @@ mod traits;
 pub use as_arc::ArcDynBytes;
 pub use as_box::BoxDynBytes;
 pub use as_rc::RcDynBytes;
-pub use traits::Bytes;
-pub use traits::OwnedBytes;
+pub use traits::{Bytes, OwnedBytes};

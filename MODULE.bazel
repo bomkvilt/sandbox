@@ -47,8 +47,9 @@ crate.from_cargo(
     manifests = [
         "//:Cargo.toml",
         # NOTE: list all the rust modules
-        # SA: ./Cargo.toml
+        # NOTE: should also be mentioned at the `./Cargo.toml`
         "//rust/basics/00.hellow_world:Cargo.toml",
+        "//rust/concepts/comp_for_macro:Cargo.toml",
         "//rust/concepts/umbra_strings:Cargo.toml",
     ],
 )
