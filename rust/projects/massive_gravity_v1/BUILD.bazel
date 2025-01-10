@@ -8,6 +8,7 @@ rust_binary(
         "src/components/camera.rs",
         "src/components/circles/mod.rs",
         "src/components/mod.rs",
+        "src/core.rs",
         "src/main.rs",
         "src/physics/mod.rs",
         "src/ui/mod.rs",

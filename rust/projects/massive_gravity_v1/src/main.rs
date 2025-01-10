@@ -9,6 +9,7 @@ use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
 
 mod components;
+mod core;
 
 struct State {
     window: Arc<Window>,
@@ -20,6 +21,7 @@ struct State {
     camera: Arc<components::camera::Camera>,
     circles: components::circles::Collection,
     circles_pipeline: components::circles::Pipeline,
+    world: Box<dyn crate::core::World>,
 }
 
 impl State {
@@ -104,15 +106,20 @@ impl State {
             },
         ]);
 
+        let world = Box::new(crate::core::Symulation::new(camera.clone()));
+
         Self {
             window,
             device,
             surface,
             config,
             queue,
+
             camera,
             circles,
             circles_pipeline,
+
+            world,
         }
     }
 
@@ -135,10 +142,14 @@ impl State {
     }
 
     fn redraw(&mut self) {
-        let frame = self
-            .surface
-            .get_current_texture()
-            .expect("Failed to acquire next swap chain texture");
+        let frame = self.surface.get_current_texture();
+
+        if let Err(ref e) = frame {
+            eprintln!("{e:?}");
+            return;
+            // frame.expect("Failed to acquire next swap chain texture");
+        }
+        let frame = frame.unwrap();
 
         let view = frame
             .texture
@@ -172,6 +183,10 @@ impl State {
         self.queue.submit(Some(encoder.finish()));
         frame.present();
     }
+
+    fn handle_event(&mut self, event_loop: &ActiveEventLoop, event: &WindowEvent) {
+        self.world.handle_event(event);
+    }
 }
 
 // =================================================================================================
@@ -184,13 +199,13 @@ struct Application {
 
 impl Application {
     fn state(&mut self) -> &mut State {
-        // NOTE: It could be wrong, but if we create the state instantly after the window
+        // NOTE: It could be wrong, but if we create the state instantly after the window,
         // the frame can have incorrect surface rendering: =~ negative paddings
         if self.state.is_none() {
             let window = self.window.as_ref().unwrap().clone();
             self.state = Some(pollster::block_on(State::new(window)));
         }
-        return self.state.as_mut().unwrap();
+        self.state.as_mut().unwrap()
     }
 }
 
@@ -201,6 +216,16 @@ impl winit::application::ApplicationHandler for Application {
             .create_window(Window::default_attributes())
             .unwrap();
         self.window = Some(window.into());
+
+        // {
+        //     let window = self.window.clone();
+        //     std::thread::spawn(move || loop {
+        //         if let Some(ref window) = window {
+        //             std::thread::sleep(std::time::Duration::from_millis(100));
+        //             window.request_redraw();
+        //         }
+        //     });
+        // }
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
@@ -214,8 +239,18 @@ impl winit::application::ApplicationHandler for Application {
             }
             WindowEvent::RedrawRequested => {
                 self.state().redraw();
+
+                if let Some(ref window) = self.window {
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    window.request_redraw();
+                }
             }
-            _ => (),
+            WindowEvent::MouseInput { .. }
+            | WindowEvent::MouseWheel { .. }
+            | WindowEvent::KeyboardInput { .. } => {
+                self.state().handle_event(event_loop, &event);
+            }
+            _ => {}
         }
     }
 }
