@@ -72,9 +72,7 @@ impl State {
 
         let queue = Arc::new(queue);
 
-        let config = surface
-            .get_default_config(&adapter, size.width, size.height)
-            .unwrap();
+        let config = surface.get_default_config(&adapter, size.width, size.height).unwrap();
         surface.configure(&device, &config);
 
         let camera = Arc::new(components::camera::Camera::new(queue.clone(), &device));
@@ -108,19 +106,7 @@ impl State {
 
         let world = Box::new(crate::core::Symulation::new(camera.clone()));
 
-        Self {
-            window,
-            device,
-            surface,
-            config,
-            queue,
-
-            camera,
-            circles,
-            circles_pipeline,
-
-            world,
-        }
+        Self { window, device, surface, config, queue, camera, circles, circles_pipeline, world }
     }
 
     fn resize(&mut self, new_size: PhysicalSize<u32>) {
@@ -151,13 +137,10 @@ impl State {
         }
         let frame = frame.unwrap();
 
-        let view = frame
-            .texture
-            .create_view(&wgpu::TextureViewDescriptor::default());
+        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-        let mut encoder = self
-            .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+        let mut encoder =
+            self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
         {
             let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -212,9 +195,7 @@ impl Application {
 impl winit::application::ApplicationHandler for Application {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         log::error!("call: resume");
-        let window = event_loop
-            .create_window(Window::default_attributes())
-            .unwrap();
+        let window = event_loop.create_window(Window::default_attributes()).unwrap();
         self.window = Some(window.into());
 
         // {

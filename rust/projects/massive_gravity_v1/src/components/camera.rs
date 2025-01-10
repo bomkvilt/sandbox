@@ -74,19 +74,12 @@ impl Camera {
             }],
         });
 
-        Self {
-            queue,
-            view: view.into(),
-            buffer,
-            layout_handle,
-            group_handle,
-        }
+        Self { queue, view: view.into(), buffer, layout_handle, group_handle }
     }
 
     pub fn sync(&self) {
         let view = *self.view.lock().unwrap();
-        self.queue
-            .write_buffer(&self.buffer, 0, bytemuck::cast_slice(&[view]));
+        self.queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(&[view]));
     }
 
     pub fn get_layout(&self) -> &wgpu::BindGroupLayout {

@@ -63,8 +63,7 @@ impl Collection {
 
     pub fn set_instances(&mut self, instances: &[Instance]) {
         self.count = u32::try_from(instances.len()).expect("too many instances");
-        self.queue
-            .write_buffer(&self.buffer, 0, bytemuck::cast_slice(instances));
+        self.queue.write_buffer(&self.buffer, 0, bytemuck::cast_slice(instances));
     }
 }
 
