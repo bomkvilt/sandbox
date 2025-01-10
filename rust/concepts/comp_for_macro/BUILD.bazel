@@ -1,0 +1,25 @@
+load("@rules_rust//rust:defs.bzl", "rust_proc_macro", "rust_test")
+
+package(default_visibility = ["//visibility:public"])
+
+rust_proc_macro(
+    name = "comp_for_macro",
+    srcs = [
+        "src/lib.rs",
+    ],
+    deps = [
+        "@crates//:proc-macro2",
+        "@crates//:quote",
+        "@crates//:syn",
+    ],
+)
+
+rust_test(
+    name = "test",
+    srcs = [
+        "test/lib.rs",
+    ],
+    proc_macro_deps = [
+        ":comp_for_macro",
+    ],
+)
