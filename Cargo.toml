@@ -4,6 +4,7 @@ members = [
   "rust/basics/00.hellow_world",
   "rust/concepts/comp_for_macro",
   "rust/concepts/umbra_strings",
+  "rust/projects/massive_gravity_v1",
 ]
 
 [profile.release]
