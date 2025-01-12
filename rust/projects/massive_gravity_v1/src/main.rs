@@ -85,22 +85,22 @@ impl State {
             components::circles::Instance {
                 position: [0.0, 0.0],
                 radius: 0.1,
-                color: [250, 0, 0, 0],
+                color: [250, 0, 0, 255],
             },
             components::circles::Instance {
                 position: [0.5, 0.0],
                 radius: 0.1,
-                color: [200, 0, 0, 0],
+                color: [200, 0, 0, 255],
             },
             components::circles::Instance {
                 position: [0.5, 0.5],
                 radius: 0.1,
-                color: [150, 0, 0, 0],
+                color: [150, 0, 0, 255],
             },
             components::circles::Instance {
                 position: [0.0, 0.5],
                 radius: 0.1,
-                color: [100, 0, 0, 0],
+                color: [100, 0, 0, 255],
             },
         ]);
 
@@ -127,21 +127,29 @@ impl State {
         self.window.request_redraw();
     }
 
-    fn redraw(&mut self) {
-        let frame = self.surface.get_current_texture();
-
-        if let Err(ref e) = frame {
-            eprintln!("{e:?}");
-            return;
-            // frame.expect("Failed to acquire next swap chain texture");
+    fn acquire(&mut self) -> wgpu::SurfaceTexture {
+        match self.surface.get_current_texture() {
+            Ok(frame) => frame,
+            Err(wgpu::SurfaceError::Timeout) => {
+                self.surface.get_current_texture().expect("Failed to acquire next surface texture!")
+            }
+            Err(..) => {
+                // Reconfiguring should help in case of:
+                // + wgpu::SurfaceError::Outdated
+                // + wgpu::SurfaceError::Lost
+                self.surface.configure(&self.device, &self.config);
+                self.surface.get_current_texture().expect("Failed to acquire next surface texture!")
+            }
         }
-        let frame = frame.unwrap();
+    }
 
-        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
+    fn redraw(&mut self) {
+        let frame = self.acquire();
 
         let mut encoder =
             self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
+        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
         {
             let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: None,
@@ -221,10 +229,10 @@ impl winit::application::ApplicationHandler for Application {
             WindowEvent::RedrawRequested => {
                 self.state().redraw();
 
-                if let Some(ref window) = self.window {
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                    window.request_redraw();
-                }
+                // if let Some(ref window) = self.window {
+                //     std::thread::sleep(std::time::Duration::from_millis(100));
+                //     window.request_redraw();
+                // }
             }
             WindowEvent::MouseInput { .. }
             | WindowEvent::MouseWheel { .. }

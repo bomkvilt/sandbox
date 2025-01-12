@@ -2,7 +2,7 @@
     "files.exclude": {
         // hide: python
         ".mypy_cache": true,
-        ".venv": true,
+        "venv": true,
 
         // hide: rust
         ".cache": true,

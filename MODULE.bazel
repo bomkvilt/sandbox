@@ -8,35 +8,60 @@ HINT: from `hedron_compile_commands`:
 module(name="sandbox")
 
 # ----------------------------------------------------------
-# setup toolchain
+# rules_cc
 # ----------------------------------------------------------
 
-bazel_dep(name="toolchains_llvm", version="1.1.2")
+bazel_dep(name="rules_cc", version="0.0.17")
+
+# ----------------------------------------------------------
+# feature: LLVM / C++
+# ----------------------------------------------------------
+
+bazel_dep(name="toolchains_llvm", version="1.2.0")
 
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency=True)
 llvm.toolchain(
     name="llvm_toolchain",
-    llvm_versions={"": "17.0.6"},
+    llvm_versions={"": "19.1.6"},  # NOTE: windows version should be installed by hands
     cxx_standard={"": "c++23"},
 )
 
+# NOTE: does not work for Windows https://github.com/bazel-contrib/toolchains_llvm/pull/342
 use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
 register_toolchains("@llvm_toolchain//:all")
 
+# ============================
+# block: windows: building with clang-cl
+# https://bazel.build/configure/windows#clang
 
-# ----------------------------------------------------------
-# support of rust targets
-# ----------------------------------------------------------
+# TODO: rid of the crutch after toolchains_llvm windows support enabled
 
-bazel_dep(name="rules_rust", version="0.51.0")
-git_override(
-    module_name="rules_rust",
-    remote="https://github.com/bazelbuild/rules_rust.git",
-    commit="144d34fdaa3c3c5fe27a9666b760aa31aa9155a5",
+# Required only for the `@local_config_cc//:cc-toolchain-x64_windows-clang-cl`
+bazel_dep(name="platforms", version="0.0.11")
+
+# Required only for the `@local_config_cc//:cc-toolchain-x64_windows-clang-cl`
+cc_configure = use_extension("@rules_cc//cc:extensions.bzl", "cc_configure_extension")
+use_repo(cc_configure, "local_config_cc")
+
+register_execution_platforms(
+    "//:x64_windows-clang-cl"
 )
 
+register_toolchains(
+    "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
+)
+
+# block: done
+# ============================
+
+# ----------------------------------------------------------
+# feature: Rust
+# ----------------------------------------------------------
+
+bazel_dep(name="rules_rust", version="0.56.0")
+
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
-rust.toolchain(edition="2021", versions=["1.81.0"])
+rust.toolchain(edition="2021", versions=["1.84.0"])
 use_repo(rust, "rust_toolchains")
 
 # SA: https://bazelbuild.github.io/rules_rust/crate_universe_bzlmod.html
@@ -56,7 +81,6 @@ crate.from_cargo(
 )
 use_repo(crate, "crates")
 
-
 # ----------------------------------------------------------
 # setup external c++ packages from Conan
 # ----------------------------------------------------------
@@ -66,7 +90,6 @@ load_conan_dependencies = use_extension(
     "conan_extension"
 )
 use_repo(load_conan_dependencies, "asio", "gtest", "benchmark")
-
 
 # ----------------------------------------------------------
 # extract build commmands (clangd & co.)
