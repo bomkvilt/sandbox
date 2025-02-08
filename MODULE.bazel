@@ -58,10 +58,10 @@ register_toolchains("@llvm_toolchain//:all")
 # feature: Rust
 # ----------------------------------------------------------
 
-bazel_dep(name="rules_rust", version="0.56.0")
+bazel_dep(name="rules_rust", version="0.57.1")
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
-rust.toolchain(edition="2021", versions=["1.84.0"])
+rust.toolchain(edition="2021", versions=["1.84.0"], rustfmt_version="1.84.0")
 use_repo(rust, "rust_toolchains")
 
 # SA: https://bazelbuild.github.io/rules_rust/crate_universe_bzlmod.html
@@ -85,11 +85,11 @@ use_repo(crate, "crates")
 # setup external c++ packages from Conan
 # ----------------------------------------------------------
 
-load_conan_dependencies = use_extension(
-    "//build/conan:conan_deps_module_extension.bzl",
-    "conan_extension"
-)
-use_repo(load_conan_dependencies, "asio", "gtest", "benchmark")
+# load_conan_dependencies = use_extension(
+#     "//build/conan:conan_deps_module_extension.bzl",
+#     "conan_extension"
+# )
+# use_repo(load_conan_dependencies, "asio", "gtest")
 
 # ----------------------------------------------------------
 # extract build commmands (clangd & co.)

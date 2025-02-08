@@ -9,7 +9,7 @@ The sketch was inspired by the project: <https://github.com/DeadlockCode/quarkst
 - install Vulkan drivers:
 
   ```sh
-  sudo apt install mesa-vulkan-drivers`
+  sudo apt install mesa-vulkan-drivers
   ```
 
 - Run the binary:

@@ -30,7 +30,16 @@ The main purpose of the step for now is to configure Conan dependencies.
 python ./build/setup/setup.py
 ```
 
-### 4. Generate compile commands to enable IDE support
+### 4. Apply auto formatters
+
+```sh
+# rust
+bazelisk run @rules_rust//:rustfmt
+
+# NOTE: `.bazelrc` file contains enforced style checks
+```
+
+### 5. Generate compile commands to enable IDE support
 
 ```sh
 # c++: compile_commands.json -> vscode::clangd
@@ -40,14 +49,7 @@ bazelisk build @hedron_compile_commands//:refresh_all
 bazelisk run @rules_rust//tools/rust_analyzer:gen_rust_project
 ```
 
-### 4. Apply auto formatters
-
-```sh
-# rust
-bazelisk run @rules_rust//:rustfmt
-```
-
-### 5. Build or Test
+### 6. Build or Test
 
 ```sh
 # build
