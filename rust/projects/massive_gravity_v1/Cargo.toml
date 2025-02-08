@@ -6,9 +6,9 @@ version = "0.1.0"
 [dependencies]
 
 # graphics
-wgpu = "23.0.0"
-wgpu-types = "23.0.0"
-winit = "0.30.8"
+wgpu = "24.0.1"
+wgpu-types = "24.0.0"
+winit = "0.30.9"
 
 # other
 bytemuck = "1.21.0"

@@ -33,14 +33,7 @@ impl State {
 
         log::error!("new size: {size:?}");
 
-        // TODO: use `wgpu::util::instance_descriptor_from_env()`
-        #[allow(clippy::default_trait_access)]
-        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
-            backends: wgpu::util::backend_bits_from_env().unwrap_or_default(),
-            dx12_shader_compiler: Default::default(),
-            gles_minor_version: Default::default(),
-            flags: Default::default(),
-        });
+        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::from_env_or_default());
 
         let surface = instance.create_surface(window.clone()).unwrap();
 
