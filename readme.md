@@ -87,6 +87,7 @@ Additional usefull information:
 
   # update links
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 12
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.12 12
   ```
 
 - how to update pip package versions:
