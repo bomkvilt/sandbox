@@ -14,14 +14,11 @@ The sketch was inspired by the project: <https://github.com/DeadlockCode/quarkst
   sudo apt install mesa-vulkan-drivers
   ```
 
-- Add some cratches
-
-  ```sh
-  export WAYLAND_DISPLAY=
-  ```
-
 - Run the executable:
 
   ```sh
-  WGPU_BACKEND=vulkan bazelisk run :bin
+  WAYLAND_DISPLAY="" WGPU_BACKEND=vulkan bazelisk run :bin
+
+  # NOTE: WAYLAND_DISPLAY="" is required to fight the error: WaylandError(Connection(NoCompositor))
+  # NOTE: WGPU_BACKEND=vulkan is required to prevent OpenGL backend usage which has issues on WSL
   ```

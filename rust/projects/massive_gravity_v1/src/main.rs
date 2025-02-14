@@ -1,13 +1,11 @@
 // TODO: remove the pragmas
 #![allow(dead_code, unused_variables, unused_mut, clippy::unused_self)]
 
-use std::ops::DerefMut;
 use std::sync::Arc;
 use winit::dpi::PhysicalSize;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
-
 mod components;
 mod core;
 
@@ -110,9 +108,8 @@ impl State {
 
         // Update viewport size
         {
-            let mut guard = self.camera.view.lock().unwrap();
-            guard.deref_mut().x = self.config.width;
-            guard.deref_mut().y = self.config.height;
+            let mut view = self.camera.view.lock().unwrap();
+            view.set_size(self.config.width, self.config.height);
         }
         self.camera.sync();
 
@@ -211,7 +208,7 @@ impl winit::application::ApplicationHandler for Application {
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
-        log::error!("call: event: {event:?}");
+        // log::error!("call: event: {event:?}");
         match event {
             WindowEvent::CloseRequested => {
                 event_loop.exit();
@@ -222,23 +219,19 @@ impl winit::application::ApplicationHandler for Application {
             WindowEvent::RedrawRequested => {
                 self.state().redraw();
 
-                // if let Some(ref window) = self.window {
-                //     std::thread::sleep(std::time::Duration::from_millis(100));
-                //     window.request_redraw();
-                // }
-            }
-            WindowEvent::MouseInput { .. }
-            | WindowEvent::MouseWheel { .. }
-            | WindowEvent::KeyboardInput { .. } => {
-                self.state().handle_event(event_loop, &event);
+                if let Some(ref window) = self.window {
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    window.request_redraw();
+                }
             }
             _ => {}
         }
+        self.state().handle_event(event_loop, &event);
     }
 }
 
 pub fn main() {
-    env_logger::init();
+    env_logger::builder().filter_level(log::LevelFilter::Info).init();
     log::error!("init()");
 
     let event_loop = EventLoop::new().unwrap();

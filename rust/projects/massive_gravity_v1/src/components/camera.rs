@@ -3,6 +3,10 @@ use std::sync::{Arc, Mutex};
 use derive_builder::Builder;
 use wgpu::util::DeviceExt;
 
+/// NOTE: Pay attention to the structure size (controlled by the _padding)
+///
+/// documentation: <https://www.w3.org/TR/WGSL/#alignment-and-size>
+/// visualisation: <https://webgpufundamentals.org/webgpu/lessons/resources/wgsl-offset-computer.html>
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Builder, bytemuck_derive::Pod, bytemuck_derive::Zeroable)]
 pub struct View {
@@ -13,15 +17,47 @@ pub struct View {
     pub scale: f32,
 
     #[builder(default)]
-    pub x: u32,
+    w: u32,
 
     #[builder(default)]
-    pub y: u32,
+    h: u32,
 
-    // documentation: https://www.w3.org/TR/WGSL/#alignment-and-size
-    // visualisation: https://webgpufundamentals.org/webgpu/lessons/resources/wgsl-offset-computer.html
+    /// Aspect ratio (width / height)
+    #[builder(default)]
+    aspect: f32,
+
+    /// Inverse aspect ratio (height / width)
+    #[builder(default)]
+    inv_aspect: f32,
+
     #[builder(default)]
     _padding: [u8; 4],
+}
+
+impl View {
+    #[allow(clippy::cast_precision_loss)]
+    pub fn set_size(&mut self, w: u32, h: u32) {
+        self.w = w.max(1);
+        self.h = h.max(1);
+        self.aspect = self.w as f32 / self.h as f32;
+        self.inv_aspect = self.h as f32 / self.w as f32;
+    }
+
+    pub fn w(&self) -> u32 {
+        self.w
+    }
+
+    pub fn h(&self) -> u32 {
+        self.h
+    }
+
+    pub fn aspect(&self) -> f32 {
+        self.aspect
+    }
+
+    pub fn inv_aspect(&self) -> f32 {
+        self.inv_aspect
+    }
 }
 
 // =================================================================================================
