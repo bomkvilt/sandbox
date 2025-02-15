@@ -3,8 +3,7 @@ use std::sync::{Arc, Mutex};
 use derive_builder::Builder;
 use wgpu::util::DeviceExt;
 
-/// NOTE: Pay attention to the structure size (controlled by the _padding)
-///
+/// NOTE: Pay attention to the structure size (can be controlled by the _padding)
 /// documentation: <https://www.w3.org/TR/WGSL/#alignment-and-size>
 /// visualisation: <https://webgpufundamentals.org/webgpu/lessons/resources/wgsl-offset-computer.html>
 #[repr(C)]
@@ -14,13 +13,10 @@ pub struct View {
     pub position: [f32; 2],
 
     #[builder(default = 1.0)]
-    pub scale: f32,
+    scale: f32,
 
-    #[builder(default)]
-    w: u32,
-
-    #[builder(default)]
-    h: u32,
+    #[builder(default = 1.0)]
+    scale_inv: f32,
 
     /// Aspect ratio (width / height)
     #[builder(default)]
@@ -31,24 +27,33 @@ pub struct View {
     inv_aspect: f32,
 
     #[builder(default)]
+    min_radius: f32,
+
+    #[builder(default)]
     _padding: [u8; 4],
 }
 
 impl View {
+    pub fn set_scale(&mut self, scale: f32) {
+        assert!(scale > 0.0, "scale must be greater than zero: scale={scale}");
+        self.scale = scale;
+        self.scale_inv = 1.0 / scale;
+    }
+
+    pub fn scale(&self) -> f32 {
+        self.scale
+    }
+
+    pub fn inv_scale(&self) -> f32 {
+        self.scale_inv
+    }
+
     #[allow(clippy::cast_precision_loss)]
     pub fn set_size(&mut self, w: u32, h: u32) {
-        self.w = w.max(1);
-        self.h = h.max(1);
-        self.aspect = self.w as f32 / self.h as f32;
-        self.inv_aspect = self.h as f32 / self.w as f32;
-    }
-
-    pub fn w(&self) -> u32 {
-        self.w
-    }
-
-    pub fn h(&self) -> u32 {
-        self.h
+        assert!(w != 0 && h != 0, "view size cannot be equal to zero: width={w}, height={h}");
+        self.aspect = w as f32 / h as f32;
+        self.inv_aspect = h as f32 / w as f32;
+        self.min_radius = 1.0 / w as f32;
     }
 
     pub fn aspect(&self) -> f32 {
@@ -57,6 +62,10 @@ impl View {
 
     pub fn inv_aspect(&self) -> f32 {
         self.inv_aspect
+    }
+
+    pub fn min_radius(&self) -> f32 {
+        self.min_radius
     }
 }
 

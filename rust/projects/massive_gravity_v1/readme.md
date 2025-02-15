@@ -2,6 +2,14 @@
 
 The sketch was inspired by the project: <https://github.com/DeadlockCode/quarkstrom/tree/master>
 
+The project aims to show how to work with:
+
+- WGSL programs
+- Rust Graphics and UI libraries
+- Parallel Rust Computing
+
+Project plannig is being leaded [here](<./project.todo>).
+
 ## Setup
 
 ### Setup.WSL

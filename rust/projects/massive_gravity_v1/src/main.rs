@@ -95,7 +95,7 @@ impl State {
             },
         ]);
 
-        let world = Box::new(crate::core::Symulation::new(camera.clone()));
+        let world = Box::new(crate::core::Simulation::new(camera.clone()));
 
         Self { window, device, surface, config, queue, camera, circles, circles_pipeline, world }
     }

@@ -29,13 +29,13 @@ pub trait World {
 
 const ZOOM_SPEED: f32 = 0.1;
 
-pub struct Symulation {
+pub struct Simulation {
     camera: Arc<components::camera::Camera>,
     drag_controller: DragController,
     window_controller: WindowController,
 }
 
-impl Symulation {
+impl Simulation {
     pub fn new(camera: Arc<components::camera::Camera>) -> Self {
         Self {
             camera,
@@ -48,8 +48,8 @@ impl Symulation {
     fn handle_camera_move(&self, view_delta: PhysicalPosition<f64>) {
         {
             let mut view = self.camera.view.lock().unwrap();
-            view.position[0] -= view_delta.x as f32 * view.scale;
-            view.position[1] -= view_delta.y as f32 * view.scale * view.inv_aspect();
+            view.position[0] -= view_delta.x as f32 * view.scale();
+            view.position[1] -= view_delta.y as f32 * view.scale() * view.inv_aspect();
         }
         self.camera.sync();
     }
@@ -57,13 +57,14 @@ impl Symulation {
     fn handle_camera_zoom(&self, zoom: f32) {
         {
             let mut view = self.camera.view.lock().unwrap();
-            view.scale *= 1.0 - zoom.clamp(-1.0, 1.0) * ZOOM_SPEED;
+            let scale = view.scale();
+            view.set_scale(scale - scale * zoom.clamp(-1.0, 1.0) * ZOOM_SPEED);
         }
         self.camera.sync();
     }
 }
 
-impl World for Symulation {
+impl World for Simulation {
     #[allow(clippy::collapsible_match)]
     #[allow(clippy::match_wildcard_for_single_variants)]
     #[allow(clippy::single_match)]
