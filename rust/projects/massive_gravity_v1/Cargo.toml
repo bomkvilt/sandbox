@@ -10,6 +10,11 @@ wgpu = "24.0.1"
 wgpu-types = "24.0.0"
 winit = "0.30.9"
 
+# gui
+imgui = { version = "0.12", features = ["tables-api"] }
+imgui-wgpu = { git = "https://github.com/Yatekii/imgui-wgpu-rs.git", rev = "3df0df4a81b2fad87b702fbcb3a7ddb8e482f5de" }  # TODO: wait for a 0.25.0 release
+imgui-winit-support = "0.13"
+
 # other
 bytemuck = "1.21.0"
 bytemuck_derive = "1.8.1"

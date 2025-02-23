@@ -1,6 +1,3 @@
-// TODO: remove the pragmas
-#![allow(dead_code, unused_variables, unused_mut, clippy::unused_self)]
-
 use std::borrow::Cow;
 use std::sync::Arc;
 

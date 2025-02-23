@@ -8,8 +8,9 @@ use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
 mod components;
 mod core;
+mod ui;
 
-struct State {
+struct AppState {
     window: Arc<Window>,
     device: wgpu::Device,
     surface: wgpu::Surface<'static>,
@@ -20,34 +21,42 @@ struct State {
     circles: components::circles::Collection,
     circles_pipeline: components::circles::Pipeline,
     world: Box<dyn crate::core::World>,
+
+    gui: ui::GuiHandler,
 }
 
-impl State {
+impl AppState {
     #[allow(clippy::too_many_lines)]
-    async fn new(window: Arc<Window>) -> State {
+    fn new(event_loop: &ActiveEventLoop) -> AppState {
+        // create a new window
+        let window = {
+            let attributes = Window::default_attributes().with_title("Massive Gravity");
+            Arc::new(event_loop.create_window(attributes).unwrap())
+        };
+
+        // deduct a window size
         let mut size = window.inner_size();
         size.width = size.width.max(1);
         size.height = size.height.max(1);
-
         log::error!("new size: {size:?}");
 
+        // create a new wgpu instance
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::from_env_or_default());
-
         let surface = instance.create_surface(window.clone()).unwrap();
 
-        let adapter = instance
-            .request_adapter(&wgpu::RequestAdapterOptions {
+        let adapter = {
+            pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::default(),
                 force_fallback_adapter: false,
                 // Request an adapter which can render to our surface
                 compatible_surface: Some(&surface),
-            })
-            .await
-            .expect("Failed to find an appropriate adapter");
+            }))
+            .expect("Failed to find an appropriate adapter")
+        };
 
-        // Create the logical device and command queue
-        let (device, queue) = adapter
-            .request_device(
+        // Create a logical device and a command queue
+        let (device, queue) = {
+            pollster::block_on(adapter.request_device(
                 &wgpu::DeviceDescriptor {
                     label: None,
                     required_features: wgpu::Features::empty(),
@@ -57,17 +66,19 @@ impl State {
                     memory_hints: wgpu::MemoryHints::MemoryUsage,
                 },
                 None,
-            )
-            .await
-            .expect("Failed to create device");
-
+            ))
+            .expect("Failed to create device")
+        };
         let queue = Arc::new(queue);
 
+        // setup swap chain
         let config = surface.get_default_config(&adapter, size.width, size.height).unwrap();
         surface.configure(&device, &config);
 
+        // create a virtual camera
         let camera = Arc::new(components::camera::Camera::new(queue.clone(), &device));
 
+        // setup primitives rendering pipeline
         let circles_pipeline =
             components::circles::Pipeline::new(&device, &surface, &config, camera.clone());
 
@@ -93,11 +104,24 @@ impl State {
                 radius: 0.1,
                 color: [100, 0, 0, 255],
             },
-        ]);
+        ]); // TODO: remove
 
         let world = Box::new(crate::core::Simulation::new(camera.clone()));
 
-        Self { window, device, surface, config, queue, camera, circles, circles_pipeline, world }
+        let gui = ui::GuiHandler::new(&window, config.format, &device, &queue);
+
+        Self {
+            window,
+            device,
+            surface,
+            config,
+            queue,
+            camera,
+            circles,
+            circles_pipeline,
+            world,
+            gui,
+        }
     }
 
     fn resize(&mut self, new_size: PhysicalSize<u32>) {
@@ -139,26 +163,32 @@ impl State {
         let mut encoder =
             self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
+        self.gui.prepare(&self.device, &self.queue, &self.window, &mut encoder);
+
         let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
         {
-            let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: None,
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
-                        store: wgpu::StoreOp::Store,
-                    },
-                })],
-                depth_stencil_attachment: None,
-                timestamp_writes: None,
-                occlusion_query_set: None,
-            });
+            let mut rpass = encoder
+                .begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: None,
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
+                            store: wgpu::StoreOp::Store,
+                        },
+                    })],
+                    depth_stencil_attachment: None,
+                    timestamp_writes: None,
+                    occlusion_query_set: None,
+                })
+                .forget_lifetime();
 
             self.circles_pipeline.snap_to_pass(&mut rpass);
             self.camera.snap_to_pass(&mut rpass);
             self.circles.render(&mut rpass);
+
+            self.gui.render(&self.device, &self.queue, &mut rpass);
         }
 
         self.queue.submit(Some(encoder.finish()));
@@ -166,6 +196,27 @@ impl State {
     }
 
     fn handle_event(&mut self, event_loop: &ActiveEventLoop, event: &WindowEvent) {
+        match event {
+            WindowEvent::CloseRequested => {
+                event_loop.exit();
+            }
+            WindowEvent::Resized(new_size) => {
+                self.resize(*new_size);
+            }
+            WindowEvent::RedrawRequested => {
+                self.redraw();
+
+                // TODO: use more correct rps limiting
+                {
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    self.window.request_redraw();
+                }
+            }
+            _ => {}
+        }
+        if self.gui.handle_event(&self.window, event) {
+            return;
+        }
         self.world.handle_event(event);
     }
 }
@@ -173,71 +224,25 @@ impl State {
 // =================================================================================================
 
 #[derive(Default)]
-struct Application {
-    state: Option<State>,
-    window: Option<Arc<Window>>,
+struct App {
+    state: Option<AppState>,
 }
 
-impl Application {
-    fn state(&mut self) -> &mut State {
-        // NOTE: It could be wrong, but if we create the state instantly after the window,
-        // the frame can have incorrect surface rendering: =~ negative paddings
-        if self.state.is_none() {
-            let window = self.window.as_ref().unwrap().clone();
-            self.state = Some(pollster::block_on(State::new(window)));
-        }
-        self.state.as_mut().unwrap()
-    }
-}
-
-impl winit::application::ApplicationHandler for Application {
+impl winit::application::ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        log::error!("call: resume");
-        let window = event_loop.create_window(Window::default_attributes()).unwrap();
-        self.window = Some(window.into());
-
-        // {
-        //     let window = self.window.clone();
-        //     std::thread::spawn(move || loop {
-        //         if let Some(ref window) = window {
-        //             std::thread::sleep(std::time::Duration::from_millis(100));
-        //             window.request_redraw();
-        //         }
-        //     });
-        // }
+        self.state = Some(AppState::new(event_loop));
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
         // log::error!("call: event: {event:?}");
-        match event {
-            WindowEvent::CloseRequested => {
-                event_loop.exit();
-            }
-            WindowEvent::Resized(new_size) => {
-                self.state().resize(new_size);
-            }
-            WindowEvent::RedrawRequested => {
-                self.state().redraw();
-
-                if let Some(ref window) = self.window {
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                    window.request_redraw();
-                }
-            }
-            _ => {}
-        }
-        self.state().handle_event(event_loop, &event);
+        self.state.as_mut().unwrap().handle_event(event_loop, &event);
     }
 }
 
 pub fn main() {
     env_logger::builder().filter_level(log::LevelFilter::Info).init();
-    log::error!("init()");
 
     let event_loop = EventLoop::new().unwrap();
     event_loop.set_control_flow(ControlFlow::Poll);
-    event_loop.set_control_flow(ControlFlow::Wait);
-
-    let mut app = Application::default();
-    let _ = event_loop.run_app(&mut app);
+    event_loop.run_app(&mut App::default()).unwrap();
 }
