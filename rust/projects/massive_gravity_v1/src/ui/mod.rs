@@ -7,7 +7,7 @@ pub struct GuiHandler {
     platform: WinitPlatform,
     renderer: Renderer,
 
-    // TODO: remove
+    // TODO: remove (move the test flags on a user-defined contrller level)
     value: f32,
     opened: bool,
 }
@@ -58,7 +58,9 @@ impl GuiHandler {
             window,
             &winit::event::Event::WindowEvent { window_id: window.id(), event: event.clone() },
         );
-        false
+
+        // TODO: match the event and return flags like this:
+        self.context.io().want_capture_mouse
     }
 
     pub fn prepare(
@@ -76,6 +78,7 @@ impl GuiHandler {
 
         let ui = self.context.frame();
 
+        // TODO: move a to user-defined UI controller
         {
             let ui_window = ui.window("Hello world");
             ui_window.size([300.0, 100.0], Condition::FirstUseEver).build(|| {
@@ -97,7 +100,7 @@ impl GuiHandler {
             ui.show_demo_window(&mut self.opened);
         }
 
-        // NOTE: can be optimized
+        // NOTE: can be optimized (???)
         // if imgui.last_cursor != ui.mouse_cursor() {
         //     imgui.last_cursor = ui.mouse_cursor();
         // }

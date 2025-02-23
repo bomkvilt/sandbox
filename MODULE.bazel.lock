@@ -591,7 +591,7 @@
           "@@//rust/basics/00.hellow_world/Cargo.toml": "db027855799b5854e51a1e77a0cc1241c6fc7db5138f86d05b6fa63986c04a32",
           "@@//rust/concepts/comp_for_macro/Cargo.toml": "ee40a6778635305e814cce91c9840d8854940eeae1fdb964e7bbf00759bbb4b6",
           "@@//rust/concepts/umbra_strings/Cargo.toml": "eadc4a3e1d291ffc5cdf87307d4cfd889ad6fe6eba4a878ab01fc2ae1c601779",
-          "@@//rust/projects/massive_gravity_v1/Cargo.toml": "5c1f20840c4272c55033d82921a78908c78265b7838e08e2a95eacd0ff0bf5ac"
+          "@@//rust/projects/massive_gravity_v1/Cargo.toml": "d0dc2823a1cd01f150d958824f20bacff078f3e0a6c7152d2a63b41115e1f750"
         },
         "recordedDirentsInputs": {},
         "envVariables": {
