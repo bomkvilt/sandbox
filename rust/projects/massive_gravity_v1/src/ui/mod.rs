@@ -2,6 +2,7 @@ use imgui::{Condition, Context, FontSource};
 use imgui_wgpu::{Renderer, RendererConfig};
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 
+/// The handler incapsulates gui layer management
 pub struct GuiHandler {
     context: Context,
     platform: WinitPlatform,
@@ -47,8 +48,15 @@ impl GuiHandler {
 
         Self { context, platform, renderer, value: 5.0, opened: false }
     }
+}
 
-    pub fn handle_event(
+// =================================================================================================
+// Event handling
+// =================================================================================================
+
+impl GuiHandler {
+    /// Handles window events and returns true if the event was captured by the UI
+    pub fn handle_window_event(
         &mut self,
         window: &winit::window::Window,
         event: &winit::event::WindowEvent,
@@ -59,10 +67,58 @@ impl GuiHandler {
             &winit::event::Event::WindowEvent { window_id: window.id(), event: event.clone() },
         );
 
-        // TODO: match the event and return flags like this:
-        self.context.io().want_capture_mouse
+        #[allow(clippy::needless_return, clippy::match_same_arms)]
+        match event {
+            winit::event::WindowEvent::MouseInput { .. } => {
+                return self.context.io().want_capture_mouse;
+            }
+            winit::event::WindowEvent::MouseWheel { .. } => {
+                return self.context.io().want_capture_mouse;
+            }
+            winit::event::WindowEvent::KeyboardInput { .. } => {
+                return self.context.io().want_capture_keyboard;
+            }
+            _ => {
+                return false;
+            }
+        };
     }
 
+    pub fn handle_user_event(&mut self, window: &winit::window::Window, event: ()) {
+        self.platform.handle_event::<()>(
+            self.context.io_mut(),
+            window,
+            &winit::event::Event::UserEvent(event),
+        );
+    }
+
+    pub fn handle_device_event(
+        &mut self,
+        window: &winit::window::Window,
+        device_id: winit::event::DeviceId,
+        event: winit::event::DeviceEvent,
+    ) {
+        self.platform.handle_event::<()>(
+            self.context.io_mut(),
+            window,
+            &winit::event::Event::DeviceEvent { device_id, event },
+        );
+    }
+
+    pub fn handle_about_to_wait(&mut self, window: &winit::window::Window) {
+        self.platform.handle_event::<()>(
+            self.context.io_mut(),
+            window,
+            &winit::event::Event::AboutToWait,
+        );
+    }
+}
+
+// =================================================================================================
+// Rendering
+// =================================================================================================
+
+impl GuiHandler {
     pub fn prepare(
         &mut self,
         device: &wgpu::Device,
@@ -100,10 +156,6 @@ impl GuiHandler {
             ui.show_demo_window(&mut self.opened);
         }
 
-        // NOTE: can be optimized (???)
-        // if imgui.last_cursor != ui.mouse_cursor() {
-        //     imgui.last_cursor = ui.mouse_cursor();
-        // }
         self.platform.prepare_render(ui, window);
     }
 

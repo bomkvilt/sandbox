@@ -195,7 +195,8 @@ impl AppState {
         frame.present();
     }
 
-    fn handle_event(&mut self, event_loop: &ActiveEventLoop, event: &WindowEvent) {
+    fn handle_window_event(&mut self, event_loop: &ActiveEventLoop, event: &WindowEvent) {
+        // stage 1: handle system events
         match event {
             WindowEvent::CloseRequested => {
                 event_loop.exit();
@@ -214,10 +215,30 @@ impl AppState {
             }
             _ => {}
         }
-        if self.gui.handle_event(&self.window, event) {
+
+        // stage 2: handle gui events
+        if self.gui.handle_window_event(&self.window, event) {
             return;
         }
+
+        // stage 3: handle world events
         self.world.handle_event(event);
+    }
+
+    fn handle_user_event(&mut self, event: ()) {
+        self.gui.handle_user_event(&self.window, event);
+    }
+
+    fn handle_device_event(
+        &mut self,
+        device_id: winit::event::DeviceId,
+        event: winit::event::DeviceEvent,
+    ) {
+        self.gui.handle_device_event(&self.window, device_id, event);
+    }
+
+    fn handle_about_to_wait(&mut self) {
+        self.gui.handle_about_to_wait(&self.window);
     }
 }
 
@@ -228,14 +249,37 @@ struct App {
     state: Option<AppState>,
 }
 
+impl App {
+    fn state(&mut self) -> &mut AppState {
+        self.state.as_mut().unwrap()
+    }
+}
+
 impl winit::application::ApplicationHandler for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         self.state = Some(AppState::new(event_loop));
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
-        // log::error!("call: event: {event:?}");
-        self.state.as_mut().unwrap().handle_event(event_loop, &event);
+        // log::error!("call: window_event: event: {event:?}");
+        self.state().handle_window_event(event_loop, &event);
+    }
+
+    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: ()) {
+        self.state().handle_user_event(event);
+    }
+
+    fn device_event(
+        &mut self,
+        _event_loop: &ActiveEventLoop,
+        device_id: winit::event::DeviceId,
+        event: winit::event::DeviceEvent,
+    ) {
+        self.state().handle_device_event(device_id, event);
+    }
+
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+        self.state().handle_about_to_wait();
     }
 }
 

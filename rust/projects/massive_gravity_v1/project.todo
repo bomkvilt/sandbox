@@ -16,8 +16,8 @@ The milistone is to have a basic working UI for the massive gravity project.
 
     Overlay UI:
     The part is required to enable the user to interact with the simulation.
-        ☐ There is an MVP of the overlay UI (can be shown/hidden over the main view)
-        ☐ UI clicks does not affect the main view panel (NOTE: view port is being moved using the mouse)
+        ✔ There is an MVP of the overlay UI (the UI apears over the main view) @done(25-02-26 01:13)
+        ✔ UI can consume mouse / keyboard events @done(25-02-26 01:13)
 
     Window-Related Features:
         ✔ Window can be resized
