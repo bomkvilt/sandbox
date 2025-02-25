@@ -1,5 +1,5 @@
 {
-  "lockFileVersion": 16,
+  "lockFileVersion": 18,
   "registryFileHashes": {
     "https://bcr.bazel.build/bazel_registry.json": "8a28e4aff06ee60aed2a8c281907fb8bcbf3b753c91fb5a5c57da3215d5b3497",
     "https://bcr.bazel.build/modules/abseil-cpp/20210324.2/MODULE.bazel": "7cd0312e064fde87c8d1cd79ba06c876bd23630c83466e9500321be55c96ace2",
@@ -584,7 +584,7 @@
     },
     "@@rules_rust+//crate_universe:extension.bzl%crate": {
       "general": {
-        "bzlTransitiveDigest": "F3vtpnRW9dME4C6ssqFtJry42czE0McdgII+dE/RpZw=",
+        "bzlTransitiveDigest": "c3VBGNxKQz/fCZhb4kslGMl4ZbhuFtRmFjw8NlYS6Zk=",
         "usagesDigest": "lCJPBF7KDH8Xeew6uKvUFi9k1QZefRQIpQzPNtAJo4I=",
         "recordedFileInputs": {
           "@@//Cargo.toml": "ccbafe5aaf870d26c1254c4120269fbfdb1df459e8bd2692107f35f943376578",
