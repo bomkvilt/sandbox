@@ -1,0 +1,66 @@
+https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
+
+Massive Gravity V1:
+The milistone is to have a basic working UI for the massive gravity project.
+
+    Particle Shaders:
+        ✔ particles are rendered with a shader
+        ✔ particles support position, size, and color
+        ✔ there is a view-port that can be moved and zoomed
+        ✔ there is a comment within a shader which describes how the view-port works
+        ✔ shaders support points which are smaller than a pixel (the smaller the dimmer) @done(25-02-15 20:07)
+
+    Basic Navigation:
+        ✔ View-port can be zoomed with the mouse
+        ✔ View-port can be moved with the mouse (click-and-grab scenario)
+
+    Overlay UI:
+    The part is required to enable the user to interact with the simulation.
+        ✔ There is an MVP of the overlay UI (the UI apears over the main view) @done(25-02-26 01:13)
+        ✔ UI can consume mouse / keyboard events @done(25-02-26 01:13)
+
+    Window-Related Features:
+        ✔ Window can be resized
+        ✔ Window can be maximized
+        ✔ Window can be minimized
+        ✔ Window can be closed
+
+    Non-Functional Requirements:
+        ✔ Component shaders are placed in individual modules
+        ✔ Camera is an independent entity that can be used by the rendering pipelines
+        ✔ Particles must be comuted separately from the rendering pipeline and must be loaded to the pipeline as a vector of structs for rendering
+
+Massive Gravity V2:
+At the stage the project start simulating gravity between particles.
+The simulation must be as simple as possible (single-threadded) but should be ready for parallelisation and asyncronisation.
+
+    Data Conveyor Architecture:
+        ☐ The architecture is prepared and visualized
+
+    Rectangular Shader:
+    Simulation splits all the region on a 2d tree wrapping the particles in a rectangular area.
+    The arias must be visible for debug / visualisation purposes.
+        ☐ The shader can render lines of the specified thickness
+        ☐ The shader support the same view-port as the particles
+        ☐ If the line width is smaller than a pixel, the line is dimmed
+
+    Basic Particle Physics:
+        ☐ Simulation can be initialized with a batch of particles
+        ☐ Simulation must be asynchronous
+        ☐ Simulation must have a RPS limiter
+        ☐ The simulation algorithm must be stable (e.g. RK4 integrator)
+        ☐ TODO:
+
+    Extended Particle Physics:
+        ☐ new particles can be added to the simulation
+        ☐ TODO:
+
+    Non-Functional Requirements:
+        ☐ Boundary boxes can be loaded to the rendering pipeline as a vector of structs when it is needed
+        ☐ All rendering pipelines must not do redundant computations and data transfers
+
+Massive Gravity V3:
+At this stage the project should parallel phisics computations and should be able to simulate a large number of particles.
+
+Massive Gravity V4:
+At this stage the project should be able to use GPU for physics computations.

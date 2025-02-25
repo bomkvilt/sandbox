@@ -145,7 +145,7 @@ macro_rules! generate_main_tests {
 }
 generate_main_tests!([ArcString, BoxString, RcString]);
 
-// // =========================================================
+// =========================================================
 
 macro_rules! generate_threaded_tests {
     (@format $name:ident, $type:ident, $N:expr) => {

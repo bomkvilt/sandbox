@@ -15,8 +15,7 @@ class Conan(conan.ConanFile):
     def requirements(self) -> None:
         assert self.requires is not None
         self.requires("asio/1.30.2")
-        self.requires("benchmark/1.8.3")
-        self.requires("gtest/1.14.0")
+        self.requires("gtest/1.15.0")
 
     def build_requirements(self) -> None:
         pass

@@ -191,7 +191,7 @@ impl<B1: trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
         }
 
         // NOTE: prefices are usialy small and can be compared using a few u64-s -> no need for slicing
-        return lhs.as_bytes() == rhs.as_bytes();
+        lhs.as_bytes() == rhs.as_bytes()
     }
 
     fn cmp<B2: trailing::OwnedBytes, const L2: usize>(
@@ -227,7 +227,7 @@ impl<B1: trailing::OwnedBytes, const L1: usize> UmbraString<B1, L1> {
         }
 
         // NOTE: prefices are usialy small and can be compared using a few u64-s -> no need for slicing
-        return Ord::cmp(lhs.as_bytes(), rhs.as_bytes());
+        Ord::cmp(lhs.as_bytes(), rhs.as_bytes())
     }
 }
 
