@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,7 +10,16 @@ rust_binary(
         "src/components/mod.rs",
         "src/core.rs",
         "src/main.rs",
+        "src/physics/coordinates/mod.rs",
+        "src/physics/cpu/barnes_hut.rs",
+        "src/physics/cpu/direct_n2.rs",
+        "src/physics/cpu/mod.rs",
+        "src/physics/energy/mod.rs",
+        "src/physics/examples/mod.rs",
+        "src/physics/integrators/mod.rs",
         "src/physics/mod.rs",
+        "src/physics/tests.rs",
+        "src/physics/timestep/mod.rs",
         "src/ui/mod.rs",
     ],
     data = [
@@ -27,10 +36,20 @@ rust_binary(
         "@crates//:imgui-winit-support",
         "@crates//:imgui",
         "@crates//:log",
+        "@crates//:nalgebra",
         "@crates//:pollster",
+        "@crates//:rand",
         "@crates//:static_assertions",
         "@crates//:wgpu",
         "@crates//:winit",
         "@rules_rust//tools/runfiles",
+    ],
+)
+
+rust_test(
+    name = "ut",
+    crate = ":bin",
+    deps = [
+        "@crates//:num-traits",
     ],
 )

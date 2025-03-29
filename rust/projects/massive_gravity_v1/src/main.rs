@@ -8,6 +8,7 @@ use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
 mod components;
 mod core;
+mod physics;
 mod ui;
 
 struct AppState {
