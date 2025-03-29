@@ -1,9 +1,7 @@
 use crate::physics::{
-    coordinates::RelativeCoordinates,
-    energy::EnergyConservation,
     integrators::{Integrator, VelocityVerlet},
     timestep::AdaptiveTimeStep,
-    GravitySimulator, Particle, SimulationConfig, WorldState, WorldStateView, G,
+    Particle, SimulationConfig, Simulator, WorldState, WorldStateView, G,
 };
 use nalgebra::Vector3;
 
@@ -118,11 +116,8 @@ pub struct BarnesHutSimulator {
     theta: f64,
     tree: Option<Node>,
     integrator: VelocityVerlet,
-    energy_conservation: Option<EnergyConservation>,
     adaptive_time_step: Option<AdaptiveTimeStep>,
-    relative_coords: Option<RelativeCoordinates>,
     config: SimulationConfig,
-    step_count: usize,
 }
 
 impl BarnesHutSimulator {
@@ -132,11 +127,8 @@ impl BarnesHutSimulator {
             theta,
             tree: None,
             integrator: VelocityVerlet,
-            energy_conservation: None,
             adaptive_time_step: None,
-            relative_coords: None,
             config: SimulationConfig::default(),
-            step_count: 0,
         }
     }
 
@@ -222,20 +214,10 @@ impl BarnesHutSimulator {
     }
 }
 
-impl GravitySimulator for BarnesHutSimulator {
-    fn initialize(&mut self, world_state: WorldState, config: SimulationConfig) {
+impl Simulator for BarnesHutSimulator {
+    fn init(&mut self, world_state: WorldState, config: SimulationConfig) {
         self.world_state = world_state;
         self.config = config;
-
-        // Initialize stability improvements
-        if self.config.use_relative_coordinates {
-            self.relative_coords = Some(RelativeCoordinates::new(&self.world_state.particles));
-        }
-
-        self.energy_conservation = Some(EnergyConservation::new(
-            &self.world_state.particles,
-            self.config.energy_tolerance,
-        ));
 
         self.adaptive_time_step = Some(AdaptiveTimeStep::new(
             self.world_state.time_step,
@@ -248,11 +230,6 @@ impl GravitySimulator for BarnesHutSimulator {
     }
 
     fn step(&mut self, dt: f64) {
-        // Convert to relative coordinates if enabled
-        if let Some(ref coords) = self.relative_coords {
-            coords.to_relative(&mut self.world_state.particles);
-        }
-
         // Calculate adaptive time step if enabled
         let effective_dt = if let Some(ref adaptive) = self.adaptive_time_step {
             adaptive.calculate_step(&self.world_state.particles)
@@ -274,19 +251,6 @@ impl GravitySimulator for BarnesHutSimulator {
                 }
             },
         );
-
-        // Periodically check and correct energy conservation
-        self.step_count += 1;
-        if self.step_count % self.config.energy_check_interval == 0 {
-            if let Some(ref energy) = self.energy_conservation {
-                energy.check_and_correct(&mut self.world_state.particles);
-            }
-        }
-
-        // Convert back to absolute coordinates if needed
-        if let Some(ref coords) = self.relative_coords {
-            coords.to_absolute(&mut self.world_state.particles);
-        }
 
         // Update simulation time
         self.world_state.timestamp += effective_dt;

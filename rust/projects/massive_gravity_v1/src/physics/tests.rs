@@ -1,7 +1,7 @@
 #![allow(unused_imports)] // TODO: remove
 
 use crate::physics::cpu::{BarnesHutSimulator, DirectN2Simulator};
-use crate::physics::{GravitySimulator, Particle, SimulationConfig, WorldState, G};
+use crate::physics::{Particle, SimulationConfig, Simulator, WorldState, G};
 use nalgebra::Vector3;
 use num_traits::cast::FromPrimitive;
 
@@ -85,7 +85,7 @@ fn create_test_system(orbital_velocity: f64) -> Vec<Particle> {
     particles
 }
 
-fn run_physics_tests<S: GravitySimulator>(simulator: &mut S, config: SimulationConfig) {
+fn run_physics_tests<S: Simulator>(simulator: &mut S, config: SimulationConfig) {
     // Calculated constants
     let orbital_velocity: f64 = (MU / ORBITAL_RADIUS).sqrt();
     let orbital_period: f64 = 2.0 * std::f64::consts::PI * ORBITAL_RADIUS / orbital_velocity;
@@ -93,7 +93,7 @@ fn run_physics_tests<S: GravitySimulator>(simulator: &mut S, config: SimulationC
 
     let mut world_state = WorldState::new();
     world_state.particles = create_test_system(orbital_velocity);
-    simulator.initialize(world_state, config);
+    simulator.init(world_state, config);
 
     // Test energy conservation
     let initial_energy = calculate_total_energy(&simulator.get_world_state().particles);
