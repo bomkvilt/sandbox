@@ -1,17 +1,17 @@
-use nalgebra::Vector3;
+use nalgebra::Vector2;
 
 pub mod cpu;
 pub mod integrators;
-pub mod timestep;
 
-// Common physics types and constants
 pub const G: f64 = 6.67430e-11; // Gravitational constant (m^3 kg^-1 s^-2)
+
+// =================================================================================================
 
 #[derive(Debug, Clone)]
 pub struct Particle {
-    pub position: Vector3<f64>,
-    pub velocity: Vector3<f64>,
-    pub acceleration: Vector3<f64>,
+    pub position: Vector2<f64>,
+    pub velocity: Vector2<f64>,
+    pub acceleration: Vector2<f64>,
     pub mass: f64,
     pub radius: f64, // For collision detection
     pub id: usize,   // Unique identifier
@@ -19,42 +19,19 @@ pub struct Particle {
 
 impl Particle {
     pub fn new(
-        position: Vector3<f64>,
-        velocity: Vector3<f64>,
+        position: Vector2<f64>,
+        velocity: Vector2<f64>,
         mass: f64,
         radius: f64,
         id: usize,
     ) -> Self {
-        Self { position, velocity, acceleration: Vector3::zeros(), mass, radius, id }
+        Self { position, velocity, acceleration: Vector2::zeros(), mass, radius, id }
     }
 }
 
 // =================================================================================================
 
-#[derive(Debug, Clone)]
-pub struct WorldState {
-    pub particles: Vec<Particle>,
-    pub timestamp: f64, // Simulation time in seconds
-}
-
-impl WorldState {
-    pub fn new() -> Self {
-        Self { particles: Vec::new(), timestamp: 0.0 }
-    }
-
-    pub fn add_particle(&mut self, particle: Particle) {
-        self.particles.push(particle);
-    }
-
-    pub fn as_view(&self) -> WorldStateView {
-        WorldStateView { particles: self.particles.clone(), timestamp: self.timestamp }
-    }
-}
-
-// =================================================================================================
-
-/// A view of the world state for rendering
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct WorldStateView {
     pub particles: Vec<Particle>,
     pub timestamp: f64,
@@ -62,37 +39,15 @@ pub struct WorldStateView {
 
 // =================================================================================================
 
-// TODO: review this
-#[derive(Debug, Clone)]
-pub struct SimulationConfig {
-    pub energy_tolerance: f64,
-    pub adaptive_time_step: bool,
-    pub energy_check_interval: usize,
-    pub safety_factor: f64,
-}
-
-impl Default for SimulationConfig {
-    fn default() -> Self {
-        Self {
-            energy_tolerance: 1e-6,
-            adaptive_time_step: false,
-            energy_check_interval: 100,
-            safety_factor: 0.1,
-        }
-    }
-}
-
-// =================================================================================================
-
 trait Simulator {
-    fn init(&mut self, world_state: WorldState, config: SimulationConfig);
+    fn init(&mut self, world_state: WorldStateView);
 
     /// Perform simulation steps.
-    /// The certain time step can be different from the dt provided.
+    /// The resulting time can differ from the "current time + dt".
     fn step(&mut self, dt: f64);
 
     /// Get a view of the world state
-    fn get_world_state(&self) -> WorldStateView;
+    fn get_state(&self) -> WorldStateView;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -106,31 +61,33 @@ pub enum SimulationMethod {
 
 pub struct Simulation {
     simulator: Box<dyn Simulator>,
+    accumulated_step: f64,
 }
 
 impl Simulation {
-    pub fn new(
-        method: SimulationMethod,
-        world_state: WorldState,
-        config: SimulationConfig,
-    ) -> Self {
+    pub fn new(method: SimulationMethod, world_state: WorldStateView) -> Self {
         let mut simulator: Box<dyn Simulator> = match method {
             SimulationMethod::DirectN2 => Box::new(cpu::DirectN2Simulator::new()),
-            SimulationMethod::BarnesHut { theta } => Box::new(cpu::BarnesHutSimulator::new(theta)),
+            // SimulationMethod::BarnesHut { theta } => Box::new(cpu::BarnesHutSimulator::new(theta)),
+            SimulationMethod::BarnesHut { .. } => panic!("Unsupported simulation method"),
         };
+        simulator.init(world_state);
 
-        // Initialize the simulator with the initial state and config
-        simulator.init(world_state, config);
-
-        Self { simulator }
+        Self { simulator, accumulated_step: 0.0 }
     }
 
-    pub fn step(&mut self, time_step: f64) {
-        self.simulator.step(time_step);
+    pub fn step(&mut self, dt: f64) {
+        self.accumulated_step += dt;
+
+        // TODO: min_step
+        while self.accumulated_step >= dt {
+            self.simulator.step(dt);
+            self.accumulated_step -= dt;
+        }
     }
 
     pub fn get_world_state(&self) -> WorldStateView {
-        self.simulator.get_world_state()
+        self.simulator.get_state()
     }
 }
 

@@ -4,21 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 rust_binary(
     name = "bin",
-    srcs = [
-        "src/components/camera.rs",
-        "src/components/circles/mod.rs",
-        "src/components/mod.rs",
-        "src/core.rs",
-        "src/main.rs",
-        "src/physics/cpu/barnes_hut.rs",
-        "src/physics/cpu/direct_n2.rs",
-        "src/physics/cpu/mod.rs",
-        "src/physics/integrators/mod.rs",
-        "src/physics/mod.rs",
-        "src/physics/tests.rs",
-        "src/physics/timestep/mod.rs",
-        "src/ui/mod.rs",
-    ],
+    srcs = glob(["src/**/*.rs"]),
     data = [
         "src/components/circles/shader.wgsl"
     ],

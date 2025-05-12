@@ -1,37 +1,11 @@
 #![allow(unused_imports)] // TODO: remove
 
-use crate::physics::cpu::{BarnesHutSimulator, DirectN2Simulator};
-use crate::physics::{Particle, SimulationConfig, Simulator, WorldState, G};
-use nalgebra::Vector3;
+use crate::physics::cpu::DirectN2Simulator;
+use crate::physics::{Particle, Simulator, WorldStateView, G};
+use nalgebra::Vector2;
 use num_traits::cast::FromPrimitive;
 
-mod constants {
-    use super::*;
-
-    // The system contains a central body and an orbiting body.
-
-    // Central body parameters
-    pub const CENTRAL_MASS: f64 = 1000.0;
-    pub const CENTRAL_RADIUS: f64 = 1.0;
-    pub const CENTRAL_ID: usize = 0;
-    pub const MU: f64 = G * CENTRAL_MASS;
-
-    // Orbiting body parameters
-    pub const ORBITER_MASS: f64 = 1.0;
-    pub const ORBITER_RADIUS: f64 = 0.1;
-    pub const ORBITER_ID: usize = 1;
-    pub const ORBITAL_RADIUS: f64 = 10.0;
-
-    // Test parameters
-    pub const STEPS_PER_ORBIT: usize = 100;
-    pub const MAX_ORBIT_STEPS: usize = 1000;
-    pub const POSITION_TOLERANCE: f64 = 1e-6;
-    pub const ENERGY_TOLERANCE: f64 = 1e-6;
-    pub const MOMENTUM_TOLERANCE: f64 = 1e-10;
-    pub const ANGULAR_MOMENTUM_TOLERANCE: f64 = 1e-10;
-}
-
-use constants::*;
+// =================================================================================================
 
 fn calculate_total_energy(particles: &[Particle]) -> f64 {
     let mut total_energy = 0.0;
@@ -52,125 +26,268 @@ fn calculate_total_energy(particles: &[Particle]) -> f64 {
     total_energy
 }
 
-fn calculate_total_momentum(particles: &[Particle]) -> Vector3<f64> {
+fn calculate_total_momentum(particles: &[Particle]) -> Vector2<f64> {
     particles.iter().map(|p| p.mass * p.velocity).sum()
 }
 
-fn calculate_total_angular_momentum(particles: &[Particle]) -> Vector3<f64> {
-    particles.iter().map(|p| p.mass * p.position.cross(&p.velocity)).sum()
+fn calculate_total_angular_momentum(particles: &[Particle]) -> f64 {
+    let cross = |a: &Vector2<f64>, b: &Vector2<f64>| a.x * b.y - a.y * b.x;
+    particles.iter().map(|p| p.mass * cross(&p.position, &p.velocity)).sum()
 }
 
-fn create_test_system(orbital_velocity: f64) -> Vec<Particle> {
-    let mut particles = vec![
-        // Central body at origin
-        Particle {
-            id: CENTRAL_ID,
-            position: Vector3::new(0.0, 0.0, 0.0),
-            velocity: Vector3::zeros(),
-            acceleration: Vector3::zeros(),
-            mass: CENTRAL_MASS,
-            radius: CENTRAL_RADIUS,
-        },
-        // Orbiting body with circular orbit velocity
-        Particle {
-            id: ORBITER_ID,
-            position: Vector3::new(ORBITAL_RADIUS, 0.0, 0.0),
-            velocity: Vector3::new(0.0, orbital_velocity, 0.0),
-            acceleration: Vector3::zeros(),
-            mass: ORBITER_MASS,
-            radius: ORBITER_RADIUS,
-        },
-    ];
+#[derive(Debug)]
+struct PeriodTracker {
+    phase: f64,
 
-    particles
+    swept: f64,
+    prev_swept: f64,
+
+    time: f64,
+    prev_time: f64,
+
+    period: Option<f64>,
 }
 
-fn run_physics_tests<S: Simulator>(simulator: &mut S, config: SimulationConfig) {
-    // Calculated constants
-    let orbital_velocity: f64 = (MU / ORBITAL_RADIUS).sqrt();
-    let orbital_period: f64 = 2.0 * std::f64::consts::PI * ORBITAL_RADIUS / orbital_velocity;
-    let time_step: f64 = orbital_period / STEPS_PER_ORBIT as f64;
-
-    let mut world_state = WorldState::new();
-    world_state.particles = create_test_system(orbital_velocity);
-    simulator.init(world_state, config);
-
-    // Test energy conservation
-    let initial_energy = calculate_total_energy(&simulator.get_world_state().particles);
-    for _ in 0..STEPS_PER_ORBIT {
-        simulator.step(time_step);
+impl PeriodTracker {
+    pub fn new(pos: Vector2<f64>, time: f64) -> Self {
+        Self {
+            phase: pos.y.atan2(pos.x),
+            swept: 0.0,
+            prev_swept: 0.0,
+            time,
+            prev_time: time,
+            period: None,
+        }
     }
 
-    let final_energy = calculate_total_energy(&simulator.get_world_state().particles);
-    let energy_diff = (final_energy - initial_energy).abs() / initial_energy;
+    pub fn update(&mut self, pos: Vector2<f64>, time: f64) -> bool {
+        let phase = pos.y.atan2(pos.x);
 
+        let delta_phase = {
+            let mut delta = phase - self.phase;
+            if delta > std::f64::consts::PI {
+                delta -= 2.0 * std::f64::consts::PI;
+            } else if delta < -std::f64::consts::PI {
+                delta += 2.0 * std::f64::consts::PI;
+            }
+            delta
+        };
+
+        self.prev_swept = self.swept;
+        self.swept += delta_phase;
+        self.phase = phase;
+
+        self.prev_time = self.time;
+        self.time = time;
+
+        if !self.is_completed() {
+            return false;
+        }
+
+        self.period = Some(self.compute_period());
+
+        std::println!("Orbiter swept: {self:?}");
+
+        true
+    }
+
+    pub fn is_completed(&self) -> bool {
+        self.swept >= Self::target_swept()
+    }
+
+    pub fn get_period(&self) -> Option<f64> {
+        self.period
+    }
+
+    pub fn get_swept(&self) -> f64 {
+        self.swept
+    }
+
+    const fn target_swept() -> f64 {
+        2.0 * std::f64::consts::PI
+    }
+
+    fn compute_period(&self) -> f64 {
+        let overshoot = self.swept - Self::target_swept();
+        let delta_swept = self.swept - self.prev_swept;
+        let fraction = 1.0 - (overshoot / delta_swept);
+
+        let time_step = self.time - self.prev_time;
+        self.prev_time + (time_step * fraction)
+    }
+}
+
+// =================================================================================================
+
+mod model {
+    use super::*;
+
+    // Central body parameters
+    pub const CENTRAL_MASS: f64 = 100_000.0;
+    pub const CENTRAL_RADIUS: f64 = 1.0;
+    pub const CENTRAL_ID: usize = 0;
+    pub const MU: f64 = G * CENTRAL_MASS;
+
+    // Orbiting body parameters
+    pub const ORBITER_MASS: f64 = 1.0;
+    pub const ORBITER_RADIUS: f64 = 0.1;
+    pub const ORBITER_ID: usize = 1;
+    pub const ORBITAL_RADIUS: f64 = 100.0;
+
+    // Test parameters
+    pub const STEPS_PER_ORBIT: usize = 500;
+    pub const MAX_ORBIT_STEPS: usize = 1000;
+    pub const POSITION_TOLERANCE: f64 = 1e-6;
+
+    pub const TOLERANCE_ENERGY_RATE: f64 = 1e-6;
+    pub const TOLERANCE_MOMENTUM_RATE: f64 = 1e-10;
+    pub const TOLERANCE_ANG_MOMENTUM_RATE: f64 = 1e-10;
+
+    pub const TOLERANCE_PERIOD_RATE: f64 = 1e-3;
+    pub const TOLERANCE_RADIUS_RATE: f64 = 1e-3;
+
+    pub struct OrbitalParams {
+        pub orbital_velocity: f64,
+        pub orbital_period: f64,
+        pub time_step: f64,
+    }
+
+    pub fn create_test_system() -> (OrbitalParams, Vec<Particle>) {
+        let orbital_velocity: f64 = (MU / ORBITAL_RADIUS).sqrt();
+        let orbital_period: f64 = 2.0 * std::f64::consts::PI * ORBITAL_RADIUS / orbital_velocity;
+        let time_step: f64 = orbital_period / STEPS_PER_ORBIT as f64;
+
+        let mut particles = vec![
+            // Central body at origin
+            Particle {
+                id: CENTRAL_ID,
+                position: Vector2::zeros(),
+                velocity: Vector2::zeros(),
+                acceleration: Vector2::zeros(),
+                mass: CENTRAL_MASS,
+                radius: CENTRAL_RADIUS,
+            },
+            // Orbiting body with circular orbit velocity
+            Particle {
+                id: ORBITER_ID,
+                position: Vector2::new(ORBITAL_RADIUS, 0.0),
+                velocity: Vector2::new(0.0, orbital_velocity),
+                acceleration: Vector2::zeros(),
+                mass: ORBITER_MASS,
+                radius: ORBITER_RADIUS,
+            },
+        ];
+
+        (OrbitalParams { orbital_velocity, orbital_period, time_step }, particles)
+    }
+}
+
+// =================================================================================================
+
+fn run_test_conservation<S: Simulator>(simulator: &mut S) {
+    // Initialize the simulator
+    let (params, particles) = model::create_test_system();
+    simulator.init(WorldStateView { particles, ..Default::default() });
+
+    let init_energy = calculate_total_energy(&simulator.get_state().particles);
+    let init_momentum = calculate_total_momentum(&simulator.get_state().particles);
+    let init_ang_momentum = calculate_total_angular_momentum(&simulator.get_state().particles);
+
+    // Evolve the system
+    for _ in 0..model::STEPS_PER_ORBIT {
+        simulator.step(params.time_step);
+    }
+
+    // Check conservation laws
+    let energy = calculate_total_energy(&simulator.get_state().particles);
+    let energy_diff = (energy - init_energy).abs() / init_energy;
     assert!(
-        energy_diff < ENERGY_TOLERANCE,
+        energy_diff < model::TOLERANCE_ENERGY_RATE,
         "Energy conservation violated: {}% change",
         energy_diff * 100.0
     );
 
-    // Test momentum conservation
-    let initial_momentum = calculate_total_momentum(&simulator.get_world_state().particles);
-    for _ in 0..STEPS_PER_ORBIT {
-        simulator.step(time_step);
-    }
-
-    let final_momentum = calculate_total_momentum(&simulator.get_world_state().particles);
-    let momentum_diff = (final_momentum - initial_momentum).norm() / initial_momentum.norm();
-    assert!(momentum_diff < MOMENTUM_TOLERANCE, "Momentum conservation violated");
-
-    // Test angular momentum conservation
-    let initial_angular_momentum =
-        calculate_total_angular_momentum(&simulator.get_world_state().particles);
-    for _ in 0..STEPS_PER_ORBIT {
-        simulator.step(time_step);
-    }
-
-    let final_angular_momentum =
-        calculate_total_angular_momentum(&simulator.get_world_state().particles);
-    let angular_momentum_diff = (final_angular_momentum - initial_angular_momentum).norm()
-        / initial_angular_momentum.norm();
+    let momentum = calculate_total_momentum(&simulator.get_state().particles);
+    let momentum_diff = (momentum - init_momentum).norm() / init_momentum.norm();
     assert!(
-        angular_momentum_diff < ANGULAR_MOMENTUM_TOLERANCE,
-        "Angular momentum conservation violated"
+        momentum_diff < model::TOLERANCE_MOMENTUM_RATE,
+        "Momentum conservation violated: {}% change",
+        momentum_diff * 100.0
     );
 
-    // Test orbital period
-    let initial_pos = simulator.get_world_state().particles[ORBITER_ID].position;
-    let mut steps = 0;
-    let mut completed_orbit = false;
-
-    while steps < MAX_ORBIT_STEPS {
-        simulator.step(time_step);
-        let current_pos = simulator.get_world_state().particles[ORBITER_ID].position;
-        let distance = (current_pos - initial_pos).norm();
-
-        println!("distance: {distance}");
-
-        if distance < POSITION_TOLERANCE {
-            completed_orbit = true;
-            break;
-        }
-        steps += 1;
-    }
-
-    assert!(completed_orbit, "Orbiter did not complete an orbit within {MAX_ORBIT_STEPS} steps");
+    let ang_momentum = calculate_total_angular_momentum(&simulator.get_state().particles);
+    let ang_momentum_diff = (ang_momentum - init_ang_momentum).abs() / init_ang_momentum.abs();
     assert!(
-        (steps as f64 - STEPS_PER_ORBIT as f64).abs() < STEPS_PER_ORBIT as f64 * 0.1,
-        "Orbital period deviates too much from expected value"
+        ang_momentum_diff < model::TOLERANCE_ANG_MOMENTUM_RATE,
+        "Angular momentum conservation violated: {}% change",
+        ang_momentum_diff * 100.0
     );
 }
 
+fn run_test_period<S: Simulator>(simulator: &mut S) {
+    // Initialize the simulator
+    let (params, particles) = model::create_test_system();
+    simulator.init(WorldStateView { particles, ..Default::default() });
+
+    // Evolve the system and track some system properties
+    let init_pos: Vector2<f64> = simulator.get_state().particles[model::ORBITER_ID].position;
+    let mut time: f64 = 0.0;
+
+    let mut tracker = PeriodTracker::new(init_pos, time);
+    let mut period = None;
+
+    let mut steps = 0;
+    while steps < model::MAX_ORBIT_STEPS {
+        simulator.step(params.time_step);
+        time += params.time_step;
+
+        let pos: Vector2<f64> = simulator.get_state().particles[model::ORBITER_ID].position;
+
+        // Check orbital shape
+        let radius_diff = (pos.norm() - model::ORBITAL_RADIUS) / model::ORBITAL_RADIUS;
+        assert!(
+            radius_diff.abs() < model::TOLERANCE_RADIUS_RATE,
+            "Orbiter radius/expected: {radius_diff:.8}",
+        );
+
+        // Check if the orbit is complete
+        if tracker.update(pos, time) {
+            period = tracker.get_period();
+            break;
+        }
+
+        steps += 1;
+    }
+
+    assert!(
+        period.is_some(),
+        "Orbiter did not complete an orbit within {} steps",
+        model::MAX_ORBIT_STEPS
+    );
+
+    // Compare with theoretical orbital period
+    let period_diff = (period.unwrap() - params.orbital_period) / params.orbital_period;
+    assert!(
+        period_diff.abs() < model::TOLERANCE_PERIOD_RATE,
+        "Orbital period deviates too much from expected value. Expected: {:.0} s, Got: {:.0} s, Diff: {:.2} %",
+        params.orbital_period,
+        period.unwrap(),
+        period_diff * 100.0,
+    );
+}
+
+// =================================================================================================
+
 #[test]
-fn test_direct_n2() {
+fn test_direct_n2_conservation() {
     let mut simulator = DirectN2Simulator::new();
-    let config = SimulationConfig {
-        energy_tolerance: ENERGY_TOLERANCE,
-        energy_check_interval: 1,
-        ..Default::default()
-    };
-    run_physics_tests(&mut simulator, config);
+    run_test_conservation(&mut simulator);
+}
+
+#[test]
+fn test_direct_n2_period() {
+    let mut simulator = DirectN2Simulator::new();
+    run_test_period(&mut simulator);
 }
 
 // #[test]
@@ -195,42 +312,5 @@ fn test_direct_n2() {
 //             ..Default::default()
 //         };
 //         run_physics_tests(&mut simulator, config);
-//     }
-// }
-
-// #[test]
-// fn test_simulator_equivalence() {
-//     let mut direct_n2 = DirectN2Simulator::new();
-//     let mut barnes_hut = BarnesHutSimulator::new(0.5);
-//     let config = SimulationConfig {
-//         energy_tolerance: ENERGY_TOLERANCE,
-//         energy_check_interval: 1,
-//         ..Default::default()
-//     };
-
-//     // Initialize both simulators with the same initial conditions
-//     let mut world_state = WorldState::new();
-//     world_state.particles = create_test_system();
-//     direct_n2.initialize(world_state.clone(), config);
-//     barnes_hut.initialize(world_state, config);
-
-//     // Run both simulators for one orbit
-//     for _ in 0..STEPS_PER_ORBIT {
-//         direct_n2.step(TIME_STEP);
-//         barnes_hut.step(TIME_STEP);
-//     }
-
-//     // Compare final states
-//     let direct_state = direct_n2.get_world_state();
-//     let barnes_state = barnes_hut.get_world_state();
-
-//     for (p1, p2) in direct_state.particles.iter().zip(barnes_state.particles.iter()) {
-//         let pos_diff = (p1.position - p2.position).norm();
-//         let vel_diff = (p1.velocity - p2.velocity).norm();
-//         let acc_diff = (p1.acceleration - p2.acceleration).norm();
-
-//         assert!(pos_diff < POSITION_TOLERANCE, "Position difference too large: {}", pos_diff);
-//         assert!(vel_diff < POSITION_TOLERANCE, "Velocity difference too large: {}", vel_diff);
-//         assert!(acc_diff < POSITION_TOLERANCE, "Acceleration difference too large: {}", acc_diff);
 //     }
 // }
