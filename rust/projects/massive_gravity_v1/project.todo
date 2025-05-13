@@ -31,15 +31,22 @@ The milistone is to have a basic working UI for the massive gravity project.
         ✔ Particles must be comuted separately from the rendering pipeline and must be loaded to the pipeline as a vector of structs for rendering
 
 Massive Gravity V2:
-At the stage the project start simulating gravity between particles.
-The simulation must be as simple as possible (single-threadded) but should be ready for parallelisation and asyncronisation.
+    At the stage the project should start simulating gravity between particles, however the simulation must be
+    as simple as possible (single-threadded) but should be ready for parallelisation and asyncronisation.
 
     Data Conveyor Architecture:
-        ☐ The architecture is prepared and visualized
+        The main idea is to have an asynchronous simulation process which prepares new world states,
+        passes them to a graphics pipeline, and requests new rendering passes.
+
+        ☐ How to deal with the situation when the simlation process slows down? (ui freezes)
+        ☐ How to deal with the situation when the rendering process slows down?
+        ☐ How simulation should communicate with the graphics pipeline? (atomic state changes)
+        ☐ Data flow architecture and visualisation
 
     Rectangular Shader:
-    Simulation splits all the region on a 2d tree wrapping the particles in a rectangular area.
-    The arias must be visible for debug / visualisation purposes.
+        Simulation splits all the region on a 2d tree wrapping the particles in a rectangular area.
+        The arias must be visible for debug / visualisation purposes.
+
         ☐ The shader can render lines of the specified thickness
         ☐ The shader support the same view-port as the particles
         ☐ If the line width is smaller than a pixel, the line is dimmed
@@ -48,7 +55,7 @@ The simulation must be as simple as possible (single-threadded) but should be re
         ☐ Simulation can be initialized with a batch of particles
         ☐ Simulation must be asynchronous
         ☐ Simulation must have a RPS limiter
-        ☐ The simulation algorithm must be stable (e.g. RK4 integrator)
+        ☐ The simulation algorithm must be stable (e.g. RK4 integrator) # TODO: move to v3
         ☐ TODO:
 
     Extended Particle Physics:
@@ -59,8 +66,11 @@ The simulation must be as simple as possible (single-threadded) but should be re
         ☐ Boundary boxes can be loaded to the rendering pipeline as a vector of structs when it is needed
         ☐ All rendering pipelines must not do redundant computations and data transfers
 
+    Improvements:
+        ☐ GUI count elapsed time instead of the hard-codded 0.1s which are currently used
+
 Massive Gravity V3:
-At this stage the project should parallel phisics computations and should be able to simulate a large number of particles.
+    At this stage the project should parallel phisics computations and should be able to simulate a large number of particles.
 
 Massive Gravity V4:
-At this stage the project should be able to use GPU for physics computations.
+    At this stage the project should be able to use GPU for physics computations.

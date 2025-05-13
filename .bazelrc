@@ -11,7 +11,7 @@ build --@rules_rust//:rustfmt.toml=//:rustfmt.toml
 build --aspects=@rules_rust//rust:defs.bzl%rust_clippy_aspect
 build --output_groups=+clippy_checks
 build --@rules_rust//:clippy.toml=//:clippy.toml
-build --@rules_rust//:clippy_flags=-D,warnings,-D,clippy::all,-D,clippy::pedantic,-A,clippy::missing-errors-doc
+build --@rules_rust//:clippy_flags=-D,warnings,-D,clippy::all,-D,clippy::pedantic,-A,clippy::missing-errors-doc,-A,clippy::cast_possible_truncation,-A,clippy::cast_lossless,-A,clippy::cast_precision_loss,-A,clippy::missing_panics_doc
 
 # This import should always be last to allow users to override settings for local development.
 try-import %workspace%/user.bazelrc

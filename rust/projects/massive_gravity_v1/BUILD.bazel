@@ -1,18 +1,10 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test")
 
 package(default_visibility = ["//visibility:public"])
 
 rust_binary(
     name = "bin",
-    srcs = [
-        "src/components/camera.rs",
-        "src/components/circles/mod.rs",
-        "src/components/mod.rs",
-        "src/core.rs",
-        "src/main.rs",
-        "src/physics/mod.rs",
-        "src/ui/mod.rs",
-    ],
+    srcs = glob(["src/**/*.rs"]),
     data = [
         "src/components/circles/shader.wgsl"
     ],
@@ -27,10 +19,20 @@ rust_binary(
         "@crates//:imgui-winit-support",
         "@crates//:imgui",
         "@crates//:log",
+        "@crates//:nalgebra",
         "@crates//:pollster",
+        "@crates//:rand",
         "@crates//:static_assertions",
         "@crates//:wgpu",
         "@crates//:winit",
         "@rules_rust//tools/runfiles",
+    ],
+)
+
+rust_test(
+    name = "ut",
+    crate = ":bin",
+    deps = [
+        "@crates//:num-traits",
     ],
 )

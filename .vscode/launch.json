@@ -18,6 +18,23 @@
                 "group": "Run", 
                 "order": 1
             },
+        },
+        {
+            "name": "rust/projects/massive_gravity_v1:ut",
+            "request": "launch",
+            "type": "lldb",
+
+            "preLaunchTask": "rust/projects/massive_gravity_v1:ut",
+
+            "program": "${workspaceFolder}/build/links/current_test.lnk",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "env": {},
+
+            "presentation": {
+                "group": "Run", 
+                "order": 1
+            },
         }
     ]
 }

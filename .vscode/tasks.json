@@ -2,13 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "rust/concepts/umbra_strings:test",
+            "label": "rust/concepts/umbra_strings:test", // NOTE: target name
             "type": "shell",
 
             "command": "python",
             "args": [
                 "${workspaceFolder}/build/scripts/link_test.py",
-                "rust/concepts/umbra_strings:test",
+                "rust/concepts/umbra_strings:test", // NOTE: target name
+                "${workspaceFolder}/build/links/current_test.lnk",
+            ],
+            
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": "build",
+        },
+        {
+            "label": "rust/projects/massive_gravity_v1:ut", // NOTE: target name
+            "type": "shell",
+
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/build/scripts/link_test.py",
+                "rust/projects/massive_gravity_v1:ut", // NOTE: target name
                 "${workspaceFolder}/build/links/current_test.lnk",
             ],
             
