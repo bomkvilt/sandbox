@@ -1,6 +1,40 @@
 {
     "version": "2.0.0",
     "tasks": [
+        // =========================================================================================
+        // project
+        // =========================================================================================
+        {
+            "label": "generate compile commands/c++",
+            "group": "build",
+
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated",
+                "close": true,
+            },
+
+            "type": "shell",
+            "command": "bazelisk",
+            "args": ["run", "@hedron_compile_commands//:refresh_all"],
+        },
+        {
+            "label": "generate compile commands/rust",
+            "group": "build",
+
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated",
+                "close": true,
+            },
+
+            "type": "shell",
+            "command": "bazelisk",
+            "args": ["run", "@rules_rust//tools/rust_analyzer:gen_rust_project"],
+        },
+        // =========================================================================================
+        // targets
+        // =========================================================================================
         {
             "label": "rust/concepts/umbra_strings:test", // NOTE: target name
             "type": "shell",

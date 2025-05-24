@@ -22,6 +22,10 @@
         "editor.defaultFormatter": "rust-lang.rust-analyzer",
         "editor.formatOnSave": true,
     },
+    "[cpp]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "xaver.clang-format",
+    },
     "editor.defaultFormatter": "ms-python.black-formatter",
     "notebook.defaultFormatter": "ms-python.black-formatter",
 

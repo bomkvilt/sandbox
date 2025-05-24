@@ -11,7 +11,7 @@ module(name="sandbox")
 # rules_cc
 # ----------------------------------------------------------
 
-bazel_dep(name="rules_cc", version="0.0.17")
+bazel_dep(name="rules_cc", version="0.1.1")
 
 # ----------------------------------------------------------
 # feature: LLVM / C++
@@ -82,8 +82,16 @@ crate.from_cargo(
 use_repo(crate, "crates")
 
 # ----------------------------------------------------------
-# setup external c++ packages from Conan
+# setup external c++ packages
 # ----------------------------------------------------------
+
+# Bazel:
+
+bazel_dep(name="boost.intrusive", version="1.87.0")
+bazel_dep(name="google_benchmark", version="1.9.2")
+bazel_dep(name="googletest", version="1.17.0")
+
+# Conan:
 
 # load_conan_dependencies = use_extension(
 #     "//build/conan:conan_deps_module_extension.bzl",
@@ -101,9 +109,3 @@ git_override(
     remote="https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     commit="1e08f8e0507b6b6b1f4416a9a22cf5c28beaba93",
 )
-
-# ----------------------------------------------------------
-# external libraries
-# ----------------------------------------------------------
-
-bazel_dep(name="google_benchmark", version="1.9.1")

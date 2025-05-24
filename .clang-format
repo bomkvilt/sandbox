@@ -1,0 +1,103 @@
+BasedOnStyle: Google
+
+ColumnLimit: 120
+IndentWidth: 4
+UseTab: Never
+
+# Block style
+BinPackArguments: false
+BinPackParameters: false
+InsertBraces: true
+InsertTrailingCommas: Wrapped
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  # functions: attach there it is possible
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+  # catch, else, etc.
+  BeforeCatch: true
+  BeforeElse: true
+
+  IndentBraces: false
+
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: false
+
+AlignAfterOpenBracket: AlwaysBreak
+
+MaxEmptyLinesToKeep: 1
+
+# Constructors
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerIndentWidth: 4
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+
+# Comments
+SpacesBeforeTrailingComments: 1
+
+# Templates
+SpaceAfterTemplateKeyword: true
+
+# Pointers
+PointerAlignment: Left
+
+# Includes
+SortIncludes: true
+IncludeBlocks: Regroup
+
+IncludeCategories:
+  # Standard library
+  - Regex: '^<[^.]+>$'
+    Priority: 1
+  # External libraries
+  - Regex: '^<.+>'
+    Priority: 10
+  # Internal libraries
+  - Regex: '"'
+    Priority: 100
+
+# Switch-case
+IndentCaseLabels: true
+
+# Functions
+IndentWrappedFunctionNames: false
+
+# Templates
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeTemplateCloser: true
+
+# Concepts
+BreakBeforeConceptDeclarations: true
+IndentRequiresClause: false
+
+# Classes
+EmptyLineBeforeAccessModifier: Always
+IndentAccessModifiers: false
+AccessModifierOffset: -4
+
+# Noexcept
+AllowBreakBeforeNoexceptSpecifier: Always
+
+# EOF
+InsertNewlineAtEOF: true
+KeepEmptyLinesAtEOF: true
