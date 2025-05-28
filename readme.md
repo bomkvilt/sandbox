@@ -110,10 +110,23 @@ Additional usefull information:
   However for some other cases, LLVM can be insalled this way:
 
   ```sh
-  # https://ubuntuhandbook.org/index.php/2023/09/how-to-install-clang-17-or-16-in-ubuntu-22-04-20-04/
+  # install
   wget https://apt.llvm.org/llvm.sh
   chmod u+x llvm.sh
-  sudo ./llvm.sh 17 all
+  sudo ./llvm.sh 21 all
+
+  # update links
+  sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-21 21
+  ```
+
+  In case modern python version (e.g. 3.13) apt_pkg package can be absent:
+
+  ```sh
+  sudo apt install --reinstall python3-apt
+  ls -la /usr/lib/python3/dist-packages/apt_pkg* # /usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so
+  sudo ln -s \
+    /usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so \
+    /usr/lib/python3/dist-packages/apt_pkg.cpython-313-x86_64-linux-gnu.so
   ```
 
   In case of Windows, it's necessary to install `VS Build tools` <https://bazel.build/configure/windows#clang>.

@@ -1,0 +1,35 @@
+cc_library(
+    name = "intrusive_lru",
+    hdrs = [
+        "intrusive_lru/lru_v1.h",
+        "intrusive_lru/lru_v2.h",
+    ],
+    deps = [
+        "@boost.intrusive//:boost.intrusive"
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "tests/test.cpp",
+    ],
+    deps = [
+        ":intrusive_lru",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_binary(
+    name = "bench",
+    srcs = [
+        "benchmarks/bench.cpp",
+    ],
+    deps = [
+        ":intrusive_lru",
+        "@google_benchmark//:benchmark",
+    ],
+)

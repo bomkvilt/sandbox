@@ -1,0 +1,86 @@
+BasedOnStyle: Google
+
+ColumnLimit: 120
+IndentWidth: 4
+UseTab: Never
+
+# Control
+OneLineFormatOffRegex: ^(// NOLINT)$
+
+# Block style
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackArguments: false
+BinPackParameters: false
+InsertBraces: true
+InsertTrailingCommas: Wrapped
+
+BreakBeforeBraces: Attach
+AlignAfterOpenBracket: BlockIndent
+MaxEmptyLinesToKeep: 1
+
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: false
+
+# Constructors
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerIndentWidth: 4
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+
+# Comments
+SpacesBeforeTrailingComments: 1
+
+# Templates
+SpaceAfterTemplateKeyword: true
+
+# Pointers
+PointerAlignment: Left
+
+# Includes
+SortIncludes: true
+IncludeBlocks: Regroup
+
+IncludeCategories:
+  # Standard library
+  - Regex: '^<[^.]+>$'
+    Priority: 1
+  # External libraries
+  - Regex: '^<.+>'
+    Priority: 10
+  # Internal libraries
+  - Regex: '"'
+    Priority: 100
+
+# Switch-case
+IndentCaseLabels: true
+
+# Functions
+IndentWrappedFunctionNames: false
+
+# Templates
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeTemplateCloser: true
+
+# Concepts
+BreakBeforeConceptDeclarations: true
+IndentRequiresClause: false
+
+# Classes
+AccessModifierOffset: -4
+BreakInheritanceList: BeforeComma
+EmptyLineBeforeAccessModifier: Always
+IndentAccessModifiers: false
+
+# Namespaces
+NamespaceIndentation: All
+
+# Noexcept
+AllowBreakBeforeNoexceptSpecifier: Always
+
+# EOF
+InsertNewlineAtEOF: true
+KeepEmptyLinesAtEOF: true
