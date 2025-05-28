@@ -3,6 +3,27 @@
     // TODO: generate the confinurations
     "configurations": [
         {
+            "name": "cpp/concepts/intrusive_lru:bench",
+            "request": "launch",
+            "type": "lldb",
+
+            "preLaunchTask": "cpp/concepts/intrusive_lru:bench",
+
+            "program": "${workspaceFolder}/build/links/current_test.lnk",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "env": {},
+
+            "sourceMap": {
+                "/proc/self/cwd": "${workspaceFolder}"
+            },
+
+            "presentation": {
+                "group": "Run",
+                "order": 1
+            },
+        },
+        {
             "name": "rust/concepts/umbra_strings:test",
             "request": "launch",
             "type": "lldb",
@@ -15,7 +36,7 @@
             "env": {},
 
             "presentation": {
-                "group": "Run", 
+                "group": "Run",
                 "order": 1
             },
         },
@@ -32,7 +53,7 @@
             "env": {},
 
             "presentation": {
-                "group": "Run", 
+                "group": "Run",
                 "order": 1
             },
         }

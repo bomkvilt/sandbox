@@ -36,6 +36,23 @@
         // targets
         // =========================================================================================
         {
+            "label": "cpp/concepts/intrusive_lru:bench", // NOTE: target name
+            "type": "shell",
+
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/build/scripts/link_test.py",
+                "cpp/concepts/intrusive_lru:bench", // NOTE: target name
+                "${workspaceFolder}/build/links/current_test.lnk",
+            ],
+            
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": "build",
+        },
+        {
             "label": "rust/concepts/umbra_strings:test", // NOTE: target name
             "type": "shell",
 

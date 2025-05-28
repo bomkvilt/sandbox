@@ -4,36 +4,19 @@ ColumnLimit: 120
 IndentWidth: 4
 UseTab: Never
 
+# Control
+OneLineFormatOffRegex: ^(// NOLINT)$
+
 # Block style
+AllowAllParametersOfDeclarationOnNextLine: false
 BinPackArguments: false
 BinPackParameters: false
 InsertBraces: true
 InsertTrailingCommas: Wrapped
 
-BreakBeforeBraces: Custom
-BraceWrapping:
-  # functions: attach there it is possible
-  AfterCaseLabel: false
-  AfterClass: false
-  AfterControlStatement: Never
-  AfterEnum: false
-  AfterFunction: true
-  AfterNamespace: false
-  AfterStruct: false
-  AfterUnion: false
-  AfterExternBlock: false
-  BeforeLambdaBody: false
-  BeforeWhile: false
-
-  SplitEmptyFunction: false
-  SplitEmptyRecord: false
-  SplitEmptyNamespace: false
-
-  # catch, else, etc.
-  BeforeCatch: true
-  BeforeElse: true
-
-  IndentBraces: false
+BreakBeforeBraces: Attach
+AlignAfterOpenBracket: BlockIndent
+MaxEmptyLinesToKeep: 1
 
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
@@ -42,10 +25,6 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: Inline
 AllowShortLoopsOnASingleLine: false
-
-AlignAfterOpenBracket: AlwaysBreak
-
-MaxEmptyLinesToKeep: 1
 
 # Constructors
 BreakConstructorInitializers: BeforeComma
@@ -91,9 +70,13 @@ BreakBeforeConceptDeclarations: true
 IndentRequiresClause: false
 
 # Classes
+AccessModifierOffset: -4
+BreakInheritanceList: BeforeComma
 EmptyLineBeforeAccessModifier: Always
 IndentAccessModifiers: false
-AccessModifierOffset: -4
+
+# Namespaces
+NamespaceIndentation: All
 
 # Noexcept
 AllowBreakBeforeNoexceptSpecifier: Always
