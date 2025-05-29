@@ -1,0 +1,30 @@
+cc_library(
+    name = "error_codes",
+    hdrs = [
+        "error_codes/collector.h",
+    ],
+    deps = [
+        # pass
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "tests/tests.cpp",
+    ],
+    deps = [
+        ":error_codes",
+        "@googletest//:gtest_main",
+    ],
+    data = [
+        "tests/golden"
+    ],
+    tags = [
+        "no-sandbox",
+    ],
+    local = True,
+)
