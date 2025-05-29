@@ -3,6 +3,27 @@
     // TODO: generate the confinurations
     "configurations": [
         {
+            "name": "cpp/concepts/error_codes:test",
+            "request": "launch",
+            "type": "lldb",
+
+            "preLaunchTask": "cpp/concepts/error_codes:test",
+
+            "program": "${workspaceFolder}/build/links/current_test.lnk",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "env": {},
+
+            "sourceMap": {
+                "/proc/self/cwd": "${workspaceFolder}"
+            },
+
+            "presentation": {
+                "group": "Run",
+                "order": 1
+            },
+        },
+        {
             "name": "cpp/concepts/intrusive_lru:bench",
             "request": "launch",
             "type": "lldb",

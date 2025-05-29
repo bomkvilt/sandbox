@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "../intrusive_lru/lru.h"
+#include "../intrusive_lru/lru_v2.h"
 
-using lru::LRUCache;
+using lru::v2::LRUCache;
 
 class LRUCacheTest : public ::testing::Test {
 protected:
