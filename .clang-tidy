@@ -1,35 +1,18 @@
-Checks: >
-  -*,
-  readability-identifier-naming,
-  readability-function-cognitive-complexity,
-  readability-misleading-indentation,
-  readability-misplaced-array-index,
-  readability-redundant-control-flow,
-  readability-redundant-function-ptr-dereference,
-  readability-simplify-boolean-expr,
-  readability-inconsistent-declaration-parameter-name,
-  readability-named-parameter,
-  readability-static-accessed-through-instance,
-  readability-use-anyofallof,
-  modernize-use-auto,
-  modernize-use-nullptr,
-  modernize-use-using,
-  modernize-loop-convert,
-  modernize-avoid-c-arrays,
-  modernize-deprecated-headers,
-  modernize-redundant-void-arg,
-  modernize-return-braced-init-list,
-  modernize-shrink-to-fit,
-  modernize-use-bool-literals,
-  modernize-use-default-member-init,
-  modernize-use-emplace,
-  modernize-use-equals-default,
-  modernize-use-equals-delete,
-  modernize-use-noexcept,
-  modernize-use-nullptr,
-  modernize-use-transparent-functors,
-  modernize-use-uncaught-exceptions,
-  modernize-use-using
+
+Checks:
+- >
+  readability-*,
+  modernize-*,
+  performance-*,
+- > # trailing return types works wors
+  -modernize-use-trailing-return-type,
+- > # does not work with explicit this
+  -readability-convert-member-functions-to-static,
+- > # blocks
+  -readability-redundant-access-specifiers,
+- > # naming
+  -readability-identifier-length,
+
 
 CheckOptions:
 - {key: readability-identifier-naming.ClassCase, value: CamelCase}
