@@ -1,0 +1,12 @@
+cc_library(
+    name = "gtest_golden",
+    hdrs = [
+        "golden.hpp",
+    ],
+    deps = [
+        "@googletest//:gtest",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)

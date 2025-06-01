@@ -1,7 +1,10 @@
 cc_library(
     name = "error_codes",
     hdrs = [
-        "error_codes/collector.h",
+        "collector.hpp",
+    ],
+    srcs = [
+        "collector.cpp",
     ],
     deps = [
         # pass
@@ -14,14 +17,15 @@ cc_library(
 cc_test(
     name = "test",
     srcs = [
-        "tests/tests.cpp",
+        "collector_ut.cpp",
     ],
     deps = [
         ":error_codes",
         "@googletest//:gtest_main",
+        "//cpp/utils/tests/gtest_golden:gtest_golden",
     ],
     data = [
-        "tests/golden"
+        "golden",
     ],
     tags = [
         "no-sandbox",

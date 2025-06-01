@@ -4,8 +4,8 @@ general errors:
 - red b <789>
 detailed errors:
 - invalid a <123>: test message: 123
-  [note] help: just give up: 456
-  [note] help: just give up: 789
+  note: just give up: 456
+  note: just give up: 789
 - missing a <456>: test message: 985
 - red b <789>: test message: 123
-  [note] help: just give up: 789
+  note: just give up: 789
