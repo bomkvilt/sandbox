@@ -1,0 +1,23 @@
+cc_library(
+    name = "visit_any",
+    hdrs = [
+        "visit.hpp",
+    ],
+    deps = [
+        # pass
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "visit_ut.cpp",
+    ],
+    deps = [
+        ":visit_any",
+        "@googletest//:gtest_main",
+    ],
+)
