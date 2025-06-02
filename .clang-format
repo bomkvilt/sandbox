@@ -72,6 +72,7 @@ IndentRequiresClause: false
 # Classes
 AccessModifierOffset: -4
 BreakInheritanceList: BeforeComma
+Cpp11BracedListStyle: true
 EmptyLineBeforeAccessModifier: Always
 IndentAccessModifiers: false
 

@@ -11,7 +11,7 @@
             "presentation": {
                 "focus": true,
                 "panel": "dedicated",
-                "close": true,
+                "close": false,
             },
 
             "type": "shell",
@@ -25,7 +25,7 @@
             "presentation": {
                 "focus": true,
                 "panel": "dedicated",
-                "close": true,
+                "close": false,
             },
 
             "type": "shell",

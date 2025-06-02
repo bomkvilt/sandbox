@@ -17,12 +17,12 @@ bazel_dep(name="rules_cc", version="0.1.1")
 # feature: LLVM / C++
 # ----------------------------------------------------------
 
-bazel_dep(name="toolchains_llvm", version="1.2.0")
+bazel_dep(name="toolchains_llvm", version="1.4.0")
 
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency=True)
 llvm.toolchain(
     name="llvm_toolchain",
-    llvm_versions={"": "19.1.0"},  # NOTE: windows version should be installed by hands
+    llvm_versions={"": "20.1.0"},  # NOTE: windows version should be installed by hands
     cxx_standard={"": "c++23"},
 )
 
