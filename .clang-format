@@ -82,6 +82,12 @@ NamespaceIndentation: All
 # Noexcept
 AllowBreakBeforeNoexceptSpecifier: Always
 
+# PreProcessor (PP)
+
+IndentPPDirectives: BeforeHash
+
+AttributeMacros: []
+
 # EOF
 InsertNewlineAtEOF: true
 KeepEmptyLinesAtEOF: true
