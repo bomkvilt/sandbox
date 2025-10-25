@@ -94,7 +94,7 @@ namespace error_codes::internal {
             return std::move(self);
         }
 
-        void flush(this Self&& self LIFETIME_BOUND) {
+        void flush(this Self&& self) {
             self.flush();
         }
 
@@ -114,7 +114,7 @@ namespace error_codes::internal {
             std::swap(ss_, other.ss_);                     // noexcept(false)
         }
 
-        void flush(this Self& self LIFETIME_BOUND);
+        void flush(this Self& self);
 
     private:
         bool need_logging_ = false;
@@ -162,7 +162,7 @@ namespace error_codes {
 
 namespace error_codes::internal {
     template <EBuilderStage stage>
-    void ErrorBuilder<stage>::flush(this Self& self LIFETIME_BOUND) {
+    void ErrorBuilder<stage>::flush(this Self& self) {
         if (self.collector_ != nullptr and self.need_logging_) {
             self.collector_->errors.insert(std::move(self.ss_).str());
         }

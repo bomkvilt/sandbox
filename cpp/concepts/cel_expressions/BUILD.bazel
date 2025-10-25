@@ -1,0 +1,20 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "main",
+    srcs = ["main.cpp"],
+    deps = [
+        "@abseil-cpp//absl/status:status",
+        "@abseil-cpp//absl/status:statusor",
+        "@abseil-cpp//absl/strings:strings",
+        "@cel-cpp//eval/public:activation",
+        "@cel-cpp//eval/public:builtin_func_registrar",
+        "@cel-cpp//eval/public:cel_expr_builder_factory",
+        "@cel-cpp//eval/public:cel_expression",
+        "@cel-cpp//eval/public:cel_function",
+        "@cel-cpp//eval/public:cel_type_registry",
+        "@cel-cpp//eval/public:cel_value",
+        "@cel-cpp//parser:parser",
+        "//cpp/utils/contrib:cel_cpp_tweaks",
+    ],
+)

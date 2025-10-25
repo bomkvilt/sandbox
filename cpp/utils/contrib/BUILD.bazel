@@ -1,0 +1,5 @@
+cc_library(
+    name = "cel_cpp_tweaks",
+    hdrs = ["cel_cpp_tweaks.hpp"],
+    deps = ["//cpp/utils/compiler:pragma"],
+)
