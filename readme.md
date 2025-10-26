@@ -66,7 +66,16 @@ bazelisk test //rust/basics/00.hellow_world:hello_lib_test
 
 ## notes
 
-Additional usefull information:
+- recomended `user.bazelrc`:
+
+  ```bazelrc
+  build --disk_cache=~/.bazel_cache/build
+  build --experimental_disk_cache_gc_max_size=40G
+  build --experimental_disk_cache_gc_max_age=30d
+  build --experimental_disk_cache_gc_idle_delay=5m
+
+  build --repository_cache=~/.bazel_cache/repos
+  ```
 
 - how to install a new-most python:
 

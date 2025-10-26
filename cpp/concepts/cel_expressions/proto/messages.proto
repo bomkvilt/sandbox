@@ -1,0 +1,20 @@
+edition = "2023";
+
+package cel_expressions.proto;
+
+message ContextA {
+    Message a = 1;
+}
+
+message ContextB {
+    Message b = 1;
+}
+
+message Message {
+    SubMessage sub_message = 1;
+}
+
+message SubMessage {
+    int32 field_1 = 1;
+    int32 field_2 = 2;
+}

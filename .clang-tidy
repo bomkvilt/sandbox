@@ -4,12 +4,13 @@ Checks:
   readability-*,
   modernize-*,
   performance-*,
-- > # trailing return types works wors
+- > # probably, not for everithing
   -modernize-use-trailing-return-type,
-- > # does not work with explicit this
+- > # does not work with "explicit this"
   -readability-convert-member-functions-to-static,
-- > # blocks
+- > # blocks and functions
   -readability-redundant-access-specifiers,
+  -readability-function-cognitive-complexity,
 - > # naming
   -readability-identifier-length,
   -readability-magic-numbers,

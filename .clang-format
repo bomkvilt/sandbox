@@ -5,7 +5,7 @@ IndentWidth: 4
 UseTab: Never
 
 # Control
-OneLineFormatOffRegex: ^(// NOLINT)$
+OneLineFormatOffRegex: ^(// clang-format skip)$
 
 # Block style
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -33,6 +33,9 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 
 # Comments
 SpacesBeforeTrailingComments: 1
+
+AlignTrailingComments:
+  Kind: Never
 
 # Templates
 SpaceAfterTemplateKeyword: true
