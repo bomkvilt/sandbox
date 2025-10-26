@@ -5,7 +5,7 @@ IndentWidth: 4
 UseTab: Never
 
 # Control
-OneLineFormatOffRegex: ^(// NOLINT)$
+OneLineFormatOffRegex: ^(// clang-format skip)$
 
 # Block style
 AllowAllParametersOfDeclarationOnNextLine: false
