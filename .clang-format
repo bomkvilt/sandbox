@@ -1,4 +1,4 @@
-BasedOnStyle: Google
+BasedOnStyle: LLVM
 
 ColumnLimit: 120
 IndentWidth: 4
@@ -33,7 +33,6 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 
 # Comments
 SpacesBeforeTrailingComments: 1
-
 AlignTrailingComments:
   Kind: Never
 
@@ -86,9 +85,7 @@ NamespaceIndentation: All
 AllowBreakBeforeNoexceptSpecifier: Always
 
 # PreProcessor (PP)
-
 IndentPPDirectives: BeforeHash
-
 AttributeMacros: []
 
 # EOF

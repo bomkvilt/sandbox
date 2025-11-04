@@ -18,10 +18,13 @@ py_proto_library(
     deps = [":proto"],
 )
 
-cc_test(
-    name = "test",
-    srcs = ["show_cases.cpp"],
+cc_library(
+    name = "common",
+    hdrs = [
+        "common.hpp",
+    ],
     deps = [
+        ":proto_cc",
         "@abseil-cpp//absl/status:status",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings:strings",
@@ -33,12 +36,26 @@ cc_test(
         "@cel-cpp//eval/public:builtin_func_registrar",
         "@cel-cpp//eval/public:cel_expr_builder_factory",
         "@cel-cpp//eval/public:cel_expression",
+        "@cel-cpp//eval/public:cel_function_adapter",
         "@cel-cpp//eval/public:cel_function",
         "@cel-cpp//eval/public:cel_type_registry",
         "@cel-cpp//eval/public:cel_value",
         "@cel-cpp//parser:parser",
+        "//cpp/utils/tests/gtest_golden:gtest_golden",
+    ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "show_cases_basic.cpp",
+        "show_cases_contexts.cpp",
+        "show_cases_methods.cpp",
+    ],
+    deps = [
+        ":common",
+        ":proto_cc",
         "@googletest//:gtest_main",
-        "//cpp/concepts/cel_expressions:proto_cc",
         "//cpp/utils/contrib:cel_cpp_tweaks",
     ],
 )

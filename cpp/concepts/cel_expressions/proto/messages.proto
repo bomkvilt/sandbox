@@ -10,6 +10,10 @@ message ContextB {
     Message b = 1;
 }
 
+message ContextC {
+    map<string, int32> map_field = 1;
+}
+
 message Message {
     SubMessage sub_message = 1;
 }
