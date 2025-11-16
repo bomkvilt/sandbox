@@ -51,10 +51,13 @@ cc_test(
         "show_cases_basic.cpp",
         "show_cases_contexts.cpp",
         "show_cases_methods.cpp",
+        "show_cases_value_producers.cpp",
     ],
     deps = [
         ":common",
         ":proto_cc",
+        "@cel-cpp//eval/public/structs:cel_proto_wrapper",
+        "@cel-cpp//eval/public:cel_value_producer",
         "@googletest//:gtest_main",
         "//cpp/utils/contrib:cel_cpp_tweaks",
     ],
