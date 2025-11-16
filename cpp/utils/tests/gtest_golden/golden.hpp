@@ -26,7 +26,7 @@ namespace golden {
             }
         }
 
-        bool MatchAndExplain(const std::string& actual, ::testing::MatchResultListener* listener) const {
+        bool MatchAndExplain(const std::string_view actual, ::testing::MatchResultListener* listener) const {
             if (not expected_) {
                 std::ofstream out{file_, std::ios::out | std::ios::trunc};
                 if (not out.is_open()) {
@@ -70,6 +70,7 @@ namespace golden {
         std::optional<std::string> expected_;
     };
 
+    [[nodiscard]]
     inline ::testing::PolymorphicMatcher<GoldenMatcher> Golden(std::string file) {
         return ::testing::PolymorphicMatcher{GoldenMatcher{std::move(file)}};
     }

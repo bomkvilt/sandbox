@@ -1,0 +1,41 @@
+edition = "2023";
+
+package cel_expressions.proto;
+
+message ContextA {
+    Message a = 1;
+}
+
+message ContextB {
+    Message b = 1;
+}
+
+message ContextC {
+    map<string, int32> map_field = 1;
+}
+
+message Message {
+    SubMessage sub_message = 1;
+}
+
+message SubMessage {
+    int32 field_1 = 1;
+    int32 field_2 = 2;
+}
+
+message MatrixContext {
+    Matrix matrix = 1;
+}
+
+message Matrix {
+    repeated MatrixRow rows = 1;
+}
+
+message MatrixRow {
+    repeated int32 elements = 1;
+}
+
+message Row {
+    string matrix_id = 1;  // Identifier to find the matrix in context
+    int32 row_index = 2;   // Index of this row within the matrix
+}

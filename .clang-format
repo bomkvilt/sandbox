@@ -1,22 +1,39 @@
-BasedOnStyle: Google
+# ==================================================================================================
+# NOTE: minimum clang-format version: 22
+#
+
+BasedOnStyle: LLVM
 
 ColumnLimit: 120
 IndentWidth: 4
 UseTab: Never
 
 # Control
-OneLineFormatOffRegex: ^(// NOLINT)$
+OneLineFormatOffRegex: ^(// clang-format skip)$
 
 # Block style
 AllowAllParametersOfDeclarationOnNextLine: false
 BinPackArguments: false
+BinPackLongBracedList: false
 BinPackParameters: false
 InsertBraces: true
 InsertTrailingCommas: Wrapped
 
 BreakBeforeBraces: Attach
-AlignAfterOpenBracket: BlockIndent
+AlignAfterOpenBracket: false
 MaxEmptyLinesToKeep: 1
+
+BreakAfterOpenBracketBracedList: true
+BreakAfterOpenBracketFunction: true
+BreakAfterOpenBracketIf: true
+BreakAfterOpenBracketLoop: true
+BreakAfterOpenBracketSwitch: true
+
+BreakBeforeCloseBracketBracedList: true
+BreakBeforeCloseBracketFunction: true
+BreakBeforeCloseBracketIf: true
+BreakBeforeCloseBracketLoop: true
+BreakBeforeCloseBracketSwitch:  true
 
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
@@ -33,6 +50,8 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 
 # Comments
 SpacesBeforeTrailingComments: 1
+AlignTrailingComments:
+  Kind: Never
 
 # Templates
 SpaceAfterTemplateKeyword: true
@@ -83,9 +102,7 @@ NamespaceIndentation: All
 AllowBreakBeforeNoexceptSpecifier: Always
 
 # PreProcessor (PP)
-
 IndentPPDirectives: BeforeHash
-
 AttributeMacros: []
 
 # EOF

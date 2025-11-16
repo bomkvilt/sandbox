@@ -1,20 +1,64 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 
-cc_binary(
-    name = "main",
-    srcs = ["main.cpp"],
+proto_library(
+    name = "proto",
+    srcs = ["proto/messages.proto"],
+)
+
+cc_proto_library(
+    name = "proto_cc",
+    deps = [":proto"],
+)
+
+py_proto_library(
+    name = "proto_py",
+    deps = [":proto"],
+)
+
+cc_library(
+    name = "common",
+    hdrs = [
+        "common.hpp",
+    ],
     deps = [
+        ":proto_cc",
         "@abseil-cpp//absl/status:status",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings:strings",
+        "@cel-cpp//compiler:compiler_factory",
+        "@cel-cpp//compiler:compiler",
+        "@cel-cpp//compiler:standard_library",
+        "@cel-cpp//eval/public:activation_bind_helper",
         "@cel-cpp//eval/public:activation",
         "@cel-cpp//eval/public:builtin_func_registrar",
         "@cel-cpp//eval/public:cel_expr_builder_factory",
         "@cel-cpp//eval/public:cel_expression",
+        "@cel-cpp//eval/public:cel_function_adapter",
         "@cel-cpp//eval/public:cel_function",
         "@cel-cpp//eval/public:cel_type_registry",
         "@cel-cpp//eval/public:cel_value",
         "@cel-cpp//parser:parser",
+        "//cpp/utils/tests/gtest_golden:gtest_golden",
+    ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "show_cases_basic.cpp",
+        "show_cases_contexts.cpp",
+        "show_cases_methods.cpp",
+        "show_cases_value_producers.cpp",
+    ],
+    deps = [
+        ":common",
+        ":proto_cc",
+        "@cel-cpp//eval/public/structs:cel_proto_wrapper",
+        "@cel-cpp//eval/public:cel_value_producer",
+        "@googletest//:gtest_main",
         "//cpp/utils/contrib:cel_cpp_tweaks",
     ],
 )

@@ -2,6 +2,7 @@
 # clangd
 /.cache/*
 /compile_commands.json
+/user.bazelrc
 
 # rust
 /rust-project.json
