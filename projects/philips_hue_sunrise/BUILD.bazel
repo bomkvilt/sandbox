@@ -1,0 +1,12 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "main",
+    srcs = [
+        "__main__.py",
+    ],
+    main = "__main__.py",
+    deps = [
+        "@pypi//click",
+    ],
+)
