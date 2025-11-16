@@ -35,7 +35,7 @@ Pygments==2.18.0
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
 pyzmq==26.1.0
-requests==2.32.3
+requests==2.32.4
 six==1.16.0
 stack-data==0.6.3
 tornado==6.4.2
