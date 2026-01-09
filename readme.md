@@ -9,7 +9,8 @@
 # python -m virtualenv venv
 # <and enter the venv>
 
-pip install -r requirements.txt
+# NOTE: --no-deps is used to suppress version conflicts...
+pip install -r requirements.txt --no-deps
 ```
 
 ### 2. Install bazelisk
