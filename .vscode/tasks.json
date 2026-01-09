@@ -5,7 +5,7 @@
         // project
         // =========================================================================================
         {
-            "label": "generate compile commands/c++",
+            "label": "__repo__/generate compile commands/c++",
             "group": "build",
 
             "presentation": {
@@ -19,7 +19,7 @@
             "args": ["run", "@hedron_compile_commands//:refresh_all"],
         },
         {
-            "label": "generate compile commands/rust",
+            "label": "__repo__/generate compile commands/rust",
             "group": "build",
 
             "presentation": {
@@ -31,6 +31,32 @@
             "type": "shell",
             "command": "bazelisk",
             "args": ["run", "@rules_rust//tools/rust_analyzer:gen_rust_project"],
+        },
+        {
+            "label": "__repo__/python/1. install requirements",
+            "group": "build",
+
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated",
+                "close": false,
+            },
+
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/bin/pip install -r requirements.txt --no-deps",
+        },
+        {
+            "label": "__repo__/python/2. refresh requirements",
+            "group": "build",
+
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated",
+                "close": false,
+            },
+
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/bin/pip freeze > ${workspaceFolder}/requirements.txt",
         },
         // =========================================================================================
         // targets

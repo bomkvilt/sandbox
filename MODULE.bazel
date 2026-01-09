@@ -1,14 +1,14 @@
 module(name="sandbox")
 
 # ----------------------------------------------------------
-# features: proto
+# language: proto
 # ----------------------------------------------------------
 
 bazel_dep(name="protobuf", version="33.0")
 bazel_dep(name="rules_proto", version="7.1.0")
 
 # ----------------------------------------------------------
-# features: c++
+# language: c++
 # ----------------------------------------------------------
 
 bazel_dep(name="toolchains_llvm", version="1.4.0")
@@ -76,10 +76,31 @@ crate.from_cargo(
 use_repo(crate, "crates")
 
 # ----------------------------------------------------------
-# features: python
+# language: python
 # ----------------------------------------------------------
 
 bazel_dep(name="rules_python", version="1.6.3")
+
+_python_version = "3.13"
+_python_repo = "pypi"
+
+python = use_extension(
+    "@rules_python//python/extensions:python.bzl",
+    "python",
+)
+python.defaults(python_version=_python_version)
+python.toolchain(python_version=_python_version)
+
+pip = use_extension(
+    "@rules_python//python/extensions:pip.bzl",
+    "pip",
+)
+pip.parse(
+    hub_name=_python_repo,
+    python_version=_python_version,
+    requirements_lock="//:requirements.txt",
+)
+use_repo(pip, _python_repo)
 
 # ----------------------------------------------------------
 # extract build commmands (clangd & co.)
