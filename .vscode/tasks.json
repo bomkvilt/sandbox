@@ -46,7 +46,7 @@
             "command": "${workspaceFolder}/venv/bin/pip install -r requirements.txt --no-deps",
         },
         {
-            "label": "__repo__/python/2. refresh requirements",
+            "label": "__repo__/python/2. dump requirements",
             "group": "build",
 
             "presentation": {

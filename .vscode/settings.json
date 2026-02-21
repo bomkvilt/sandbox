@@ -30,6 +30,13 @@
     "notebook.defaultFormatter": "ms-python.black-formatter",
 
     // language: python
+    "python.analysis.exclude": [
+        ".cache",
+        "bazel-*",
+        "external",
+        "target",
+        "venv",
+    ],
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.defaultInterpreterPath": "./.venv/bin/python3.12",
